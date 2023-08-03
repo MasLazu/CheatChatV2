@@ -1,0 +1,3 @@
+CREATE TABLE chat_rooms (
+    id BIGSERIAL PRIMARY KEY
+);
