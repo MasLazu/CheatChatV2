@@ -3,12 +3,13 @@ package router
 import (
 	"github.com/MasLazu/CheatChatV2/controller"
 	"github.com/MasLazu/CheatChatV2/middleware"
+	"github.com/MasLazu/CheatChatV2/websocketProvider"
 
 	"github.com/gorilla/mux"
 )
 
 func MainRouter(router *mux.Router) {
-	//websocketManager := websocket.NewWebsocketService()
+	websocketManager := websocketProvider.NewWebsocketManager()
 
 	loginRoute := router.PathPrefix("/login").Subrouter()
 	loginRoute.Use(middleware.LoginOnlyMiddleware)
@@ -18,7 +19,7 @@ func MainRouter(router *mux.Router) {
 	loginRoute.HandleFunc("/preview_chats", controller.GetPreviewChatController).Methods("GET")
 	loginRoute.HandleFunc("/contact", controller.AddContactController).Methods("POST")
 	loginRoute.HandleFunc("/group", controller.MakeGroupController).Methods("POST")
-	//loginRoute.HandleFunc("/ws", websocketManager.Connect).Methods("GET")
+	loginRoute.HandleFunc("/ws", websocketManager.Connect).Methods("GET")
 
 	guestRoute := router.PathPrefix("/guest").Subrouter()
 	guestRoute.Use(middleware.GuestOnlyMiddleware)

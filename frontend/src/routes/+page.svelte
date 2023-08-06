@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Avatar, filter } from '@skeletonlabs/skeleton'
+	import { Avatar } from '@skeletonlabs/skeleton'
 	import OtherChatBubble from '$lib/components/OtherChatBubble.svelte'
 	import OurChatBubble from '$lib/components/OurChatBubble.svelte'
 	import PreviewMessage from '$lib/components/PreviewMessage.svelte'
@@ -134,6 +134,7 @@
 			>
 				<PageTransition trigger={selectedSidebar}>
 					{#if selectedSidebar === 'messages'}
+						<!-- messages tab -->
 						<h4 class="text-slate-400 text-sm p-2.5 pt-0">
 							<i class="bi bi-geo-alt-fill mr-2" />Pinned Message
 						</h4>
@@ -150,13 +151,28 @@
 							<PreviewMessage {...message} photo={Math.floor(Math.random() * (40 - 1 + 1)) + 1} />
 						{/each}
 					{:else if selectedSidebar === 'contacts'}
-						<h4 class="text-slate-400 text-sm p-2.5 pt-0">
-							<i class="bi bi-house-fill mr-2" />Group
-						</h4>
+						<!-- contacts tab -->
+						<div class="flex justify-between items-center text-slate-400 p-2.5 pt-0">
+							<h4 class="text-sm">
+								<i class="bi bi-house-fill mr-2" />Group
+							</h4>
+							<button
+								class="h-6 grid place-content-center hover:bg-primary-500 hover:text-white rounded-full cursor-pointer transition-all duration-200"
+							>
+								<i class="bi bi-plus text-2xl" />
+							</button>
+						</div>
 						<GroupPriview />
-						<h4 class="text-slate-400 text-sm p-2.5">
-							<i class="bi bi-person-fill mr-2" />Person
-						</h4>
+						<div class="flex justify-between items-center text-slate-400 p-2.5 pt-0">
+							<h4 class="text-sm">
+								<i class="bi bi-house-fill mr-2" />Group
+							</h4>
+							<button
+								class="h-6 grid place-content-center hover:bg-primary-500 hover:text-white rounded-full cursor-pointer transition-all duration-200"
+							>
+								<i class="bi bi-plus text-2xl" />
+							</button>
+						</div>
 						{#each $contactsStore as contact}
 							<ContactPreview
 								name={contact.name}
@@ -170,7 +186,7 @@
 		</div>
 	</aside>
 
-	<main class="lg:w-[73%] md:w-[69%] md:flex hidden flex-col bg-white h-screen">
+	<main class="lg:w-[73%] md:w-[67%] md:flex hidden flex-col bg-white h-screen">
 		<div
 			class="top-bar py-4 px-6 flex justify-between items-center"
 			style="height: {heightTopBar}px;"

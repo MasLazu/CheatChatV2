@@ -7,6 +7,7 @@ import (
 )
 
 type GroupService interface {
+	MakeGroup(userEmail string, groupName string, ctx context.Context) (domain.Group, error)
 }
 
 type GroupServiceImpl struct {

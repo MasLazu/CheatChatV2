@@ -19,12 +19,15 @@
 	const handleLogin = async () => {
 		if ($form.valid) {
 			try {
-				await axios.post(import.meta.env.VITE_BACKEND_DOMAIN + '/api/guest/login', $form.values, {
-					withCredentials: true
-				})
-				const result: AxiosResponse<LoginApiResponse> = await axios.post(
-					import.meta.env.VITE_BACKEND_DOMAIN + '/api/login/current',
+				await axios.post(
+					'http://' + import.meta.env.VITE_BACKEND_DOMAIN + '/api/guest/login',
 					$form.values,
+					{
+						withCredentials: true
+					}
+				)
+				const result: AxiosResponse<LoginApiResponse> = await axios.get(
+					'http://' + import.meta.env.VITE_BACKEND_DOMAIN + '/api/login/current',
 					{ withCredentials: true }
 				)
 				userStore.set(result.data.data)

@@ -1,9 +1,9 @@
-package websocket
+package websocketProvider
 
 import (
 	"encoding/json"
+	"github.com/MasLazu/CheatChatV2/model"
 	"log"
-	"runtime"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -12,9 +12,9 @@ import (
 type Client struct {
 	Conn        *websocket.Conn
 	UserEmail   string
-	GroupList   []int32
-	MessageChan chan interface{}
-	Manager     *WebsocketService
+	GroupList   []int64
+	MessageChan chan model.WebsocketReqRes
+	Manager     *Manager
 }
 
 const (
@@ -22,18 +22,18 @@ const (
 	pingInterval = pongWait * 9 / 10
 )
 
-func NewClient(conn *websocket.Conn, manager *WebsocketService, email string, userId int32, groupList []int32) *Client {
+func NewClient(conn *websocket.Conn, manager *Manager, email string, groupList []int64) *Client {
 	return &Client{
 		Conn:        conn,
 		UserEmail:   email,
 		GroupList:   groupList,
-		MessageChan: make(chan interface{}),
+		MessageChan: make(chan model.WebsocketReqRes),
 		Manager:     manager,
 	}
 }
 
 func (client *Client) PongHandler(pongMessage string) error {
-	log.Println("pong : ", client.UserEmail)
+	log.Println(pongMessage, " from ", client.UserEmail)
 	return client.Conn.SetReadDeadline(time.Now().Add(pongWait))
 }
 
@@ -53,16 +53,15 @@ func (client *Client) ReadMessage() {
 	for {
 		_, payload, err := client.Conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error reading message: %v", err)
+				log.Println(err, " reading message from ", client.UserEmail)
 			}
 			break
 		}
 
-		var request interface{}
+		var request model.WebsocketReqRes
 		if err := json.Unmarshal(payload, &request); err != nil {
-			log.Printf("error marshalling message: %v", err)
+			log.Println(err, " marshalling message from ", client.UserEmail)
 			break
 		}
 
@@ -81,17 +80,12 @@ func (client *Client) WriteMessage() {
 	for {
 		select {
 		case message := <-client.MessageChan:
-			// disini harusnya websocket router(message, client)
-			//if message.DestinationType == client.Manager.PersonalMessageType {
-			//	client.Manager.sendMessageToUser(message, client)
-			//} else if message.DestinationType == client.Manager.GroupMessageType {
-			//	client.Manager.brodcastToGroupMember(message, client)
-			//}
+			client.Manager.Router(message)
 		case <-ticker.C:
-			log.Println("cuncurent client : ", len(client.Manager.Clients.Clients))
-			log.Println("ping : ", client, "goroutine : ", runtime.NumGoroutine())
+			log.Println("current client : ", len(client.Manager.Clients.Clients))
+			log.Println("sending ping to ", client.UserEmail)
 			if err := client.Conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				log.Println("write message: ", err)
+				log.Println(err, "while sending ping to ", client.UserEmail)
 				return
 			}
 		}

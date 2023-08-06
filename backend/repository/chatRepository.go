@@ -3,12 +3,17 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/MasLazu/CheatChatV2/database"
 	"github.com/MasLazu/CheatChatV2/model"
+	"github.com/MasLazu/CheatChatV2/model/domain"
 )
 
 type ChatsRepository interface {
-	GetPreviewChatGroup(ctx context.Context, userEmail string) (model.PreviewGroupChat, error)
+	Save(ctx context.Context, chat domain.Chat) (int64, error)
+	GetPreviewGroupChats(ctx context.Context, userEmail string) ([]model.PreviewGroupChat, error)
+	GetPreviewPersonalChats(ctx context.Context, userEmail string) ([]model.PreviewPersonalChat, error)
+	GetPersonalChatRoom(ctx context.Context, userEmail1 string, userEmail2 string) (int64, error)
 }
 
 type ChatsRepositoryImpl struct {
@@ -19,6 +24,16 @@ func NewChatsRepository() *ChatsRepositoryImpl {
 	return &ChatsRepositoryImpl{
 		databaseConn: database.GetDBConn(),
 	}
+}
+
+func (repository ChatsRepositoryImpl) Save(ctx context.Context, chat domain.Chat) (int64, error) {
+	var id int64
+	sql := "INSERT INTO chats (sender_email, message, chat_room, created_at) VALUES ($1, $2, $3, $4) RETURNING id"
+	if err := repository.databaseConn.QueryRowContext(ctx, sql, chat.SenderEmail, chat.Message, chat.ChatRoom, chat.CreatedAt).Scan(&id); err != nil {
+		return id, err
+	}
+
+	return id, nil
 }
 
 func (repository ChatsRepositoryImpl) GetPreviewGroupChats(ctx context.Context, userEmail string) ([]model.PreviewGroupChat, error) {
@@ -57,4 +72,22 @@ func (repository ChatsRepositoryImpl) GetPreviewPersonalChats(ctx context.Contex
 		previewPersonalChats = append(previewPersonalChats, previewPersonalChat)
 	}
 	return previewPersonalChats, nil
+}
+
+func (repository ChatsRepositoryImpl) GetPersonalChatRoom(ctx context.Context, userEmail1 string, userEmail2 string) (int64, error) {
+	var chatRoom int64
+	sql := "SELECT cr.id from personals p INNER JOIN chat_rooms cr on p.chat_room = cr.id WHERE (p.user_email_1 = $1 AND p.user_email_2 =$2) OR (p.user_email_2 = $1 AND p.user_email_1 = $2)"
+	row, err := repository.databaseConn.QueryContext(ctx, sql, userEmail1, userEmail2)
+	if err != nil {
+		return chatRoom, err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		if err := row.Scan(&chatRoom); err != nil {
+			return chatRoom, err
+		}
+		return chatRoom, nil
+	}
+	return chatRoom, errors.New("not found")
 }

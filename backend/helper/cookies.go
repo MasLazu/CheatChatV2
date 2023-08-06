@@ -11,7 +11,6 @@ func SetCookies(writer http.ResponseWriter, name string, value string, expires t
 		Value:    value,
 		Expires:  expires,
 		HttpOnly: true,
-		Domain:   ".localhost",
 		Path:     "/",
 		SameSite: http.SameSiteNoneMode,
 		Secure:   false,

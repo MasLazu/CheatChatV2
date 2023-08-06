@@ -17,7 +17,7 @@
 			console.log($form.values)
 			try {
 				const result: AxiosResponse<RegisterApiResponse> = await axios.post(
-					import.meta.env.VITE_BACKEND_DOMAIN + '/api/guest/login',
+					'http://' + import.meta.env.VITE_BACKEND_DOMAIN + '/api/guest/register',
 					$form.values,
 					{ withCredentials: true }
 				)
@@ -30,13 +30,13 @@
 </script>
 
 <div class="flex justify-center items-center h-screen w-screen">
-	<form use:form class="w-96 bg-white rounded-xl px-7 py-8 shadow-lg">
+	<form use:form class="w-96 bg-white rounded-2xl px-7 py-8 border-[1px] border-slate-200">
 		<h1 class="text-4xl font-semibold text-center mb-10">Register</h1>
 		<label class="label my-3">
 			<span class="ml-1">Username</span>
 			<input
 				name="username"
-				class="input py-2 px-3 outline-none rounded-xl"
+				class="bg-slate-100 border-[1px] border-slate-200 outline-none px-4 py-2.5 rounded-2xl"
 				type="text"
 				placeholder="Input"
 				use:validators={[required]}
@@ -47,7 +47,7 @@
 			<span class="ml-1">Email</span>
 			<input
 				name="email"
-				class="input py-2 px-3 outline-none rounded-xl"
+				class="bg-slate-100 border-[1px] border-slate-200 outline-none px-4 py-2.5 rounded-2xl"
 				type="text"
 				placeholder="Input"
 				use:validators={[required, email]}
@@ -61,7 +61,7 @@
 			<span class="ml-1">Password</span>
 			<input
 				name="password"
-				class="input py-2 px-3 outline-none rounded-xl"
+				class="bg-slate-100 border-[1px] border-slate-200 outline-none px-4 py-2.5 rounded-2xl"
 				type="password"
 				placeholder="Input"
 				use:validators={[required, minLength(6)]}
@@ -74,7 +74,8 @@
 		<button
 			type="button"
 			on:click|preventDefault={handleLogin}
-			class="btn btn-lg variant-filled w-full mt-10 rounded-xl">Register</button
+			class="btn btn-lg variant-filled w-full mt-10 rounded-2xl variant-filled-primary text-white"
+			>Register</button
 		>
 		<div class="text-center text-sm my-2">
 			not have an account ? <a href="/login" class="text-sky-500" data-sveltekit-preload-data

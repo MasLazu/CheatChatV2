@@ -19,7 +19,14 @@ type PreviewPersonalChat struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+type ChatResponse struct {
+	Id          int64     `json:"id"`
+	SenderEmail string    `json:"sender_email"`
+	Message     string    `json:"message"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 type PreviewChatResponse struct {
-	Group    []PreviewGroupChat
-	Personal []PreviewPersonalChat
+	Group    []PreviewGroupChat    `json:"group"`
+	Personal []PreviewPersonalChat `json:"personal"`
 }
