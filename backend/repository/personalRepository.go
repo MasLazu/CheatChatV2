@@ -17,7 +17,7 @@ type PersonalRepositoryImpl struct {
 	databaseConn *sql.DB
 }
 
-func NewPersonalRepository() *PersonalRepositoryImpl {
+func NewPersonalRepository() PersonalRepository {
 	return &PersonalRepositoryImpl{
 		databaseConn: database.GetDBConn(),
 	}

@@ -8,13 +8,13 @@ import (
 )
 
 type ChatService interface {
-	SavePersonalChat(sender string, receiver string) error
+	SavePersonalChat(senderEmail string, receiverEmail string, message string, createdAt time.Time) (int64, error)
 }
 
 type ChatServiceImpl struct {
 }
 
-func NewChatService() *ChatServiceImpl {
+func NewChatService() ChatService {
 	return &ChatServiceImpl{}
 }
 

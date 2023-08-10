@@ -9,14 +9,14 @@ import (
 
 type ContactRepository interface {
 	Save(ctx context.Context, contact domain.Contact) error
-	GetAllUserContact(ctx context.Context, userEmail string) ([]domain.Contact, error)
+	GetUserContacts(ctx context.Context, userEmail string) ([]domain.Contact, error)
 }
 
 type ContactRepositoryImpl struct {
 	databaseConn *sql.DB
 }
 
-func NewContactRepository() *ContactRepositoryImpl {
+func NewContactRepository() ContactRepository {
 	return &ContactRepositoryImpl{
 		databaseConn: database.GetDBConn(),
 	}

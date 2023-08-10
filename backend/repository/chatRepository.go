@@ -14,13 +14,15 @@ type ChatsRepository interface {
 	GetPreviewGroupChats(ctx context.Context, userEmail string) ([]model.PreviewGroupChat, error)
 	GetPreviewPersonalChats(ctx context.Context, userEmail string) ([]model.PreviewPersonalChat, error)
 	GetPersonalChatRoom(ctx context.Context, userEmail1 string, userEmail2 string) (int64, error)
+	GetPersonalChats(ctx context.Context, userEmail1 string, userEmail2 string) ([]domain.Chat, error)
+	GetGroupChats(ctx context.Context, groupId int64) ([]domain.Chat, error)
 }
 
 type ChatsRepositoryImpl struct {
 	databaseConn *sql.DB
 }
 
-func NewChatsRepository() *ChatsRepositoryImpl {
+func NewChatsRepository() ChatsRepository {
 	return &ChatsRepositoryImpl{
 		databaseConn: database.GetDBConn(),
 	}
@@ -90,4 +92,52 @@ func (repository ChatsRepositoryImpl) GetPersonalChatRoom(ctx context.Context, u
 		return chatRoom, nil
 	}
 	return chatRoom, errors.New("not found")
+}
+
+func (repository ChatsRepositoryImpl) GetPersonalChats(ctx context.Context, userEmail1 string, userEmail2 string) ([]domain.Chat, error) {
+	var chats []domain.Chat
+	sql := "SELECT c.id, c.sender_email, c.message, c.created_at FROM personals p INNER JOIN chat_rooms cr ON p.chat_room = cr.id INNER JOIN chats c ON cr.id = c.chat_room WHERE (p.user_email_1 = $1 AND p.user_email_2 = $2) OR (p.user_email_2 = $1 AND p.user_email_1 = $2);"
+	row, err := repository.databaseConn.QueryContext(ctx, sql, userEmail1, userEmail2)
+	if err != nil {
+		return chats, err
+	}
+	defer row.Close()
+
+	for row.Next() {
+		var chat domain.Chat
+		if err := row.Scan(&chat.Id, &chat.SenderEmail, &chat.Message, &chat.CreatedAt); err != nil {
+			return chats, err
+		}
+		chats = append(chats, chat)
+	}
+
+	if len(chats) == 0 {
+		return chats, errors.New("not found")
+	}
+
+	return chats, nil
+}
+
+func (repository ChatsRepositoryImpl) GetGroupChats(ctx context.Context, groupId int64) ([]domain.Chat, error) {
+	var chats []domain.Chat
+	sql := "SELECT c.id, c.sender_email, c.message, c.created_at FROM groups g INNER JOIN chat_rooms cr ON cr.id = g.chat_room INNER JOIN chats c ON cr.id = c.chat_room WHERE g.id = $1;"
+	row, err := repository.databaseConn.QueryContext(ctx, sql, groupId)
+	if err != nil {
+		return chats, err
+	}
+	defer row.Close()
+
+	for row.Next() {
+		var chat domain.Chat
+		if err := row.Scan(&chat.Id, &chat.SenderEmail, &chat.Message, &chat.CreatedAt); err != nil {
+			return chats, err
+		}
+		chats = append(chats, chat)
+	}
+
+	if len(chats) == 0 {
+		return chats, errors.New("not found")
+	}
+
+	return chats, nil
 }

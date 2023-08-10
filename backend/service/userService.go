@@ -15,15 +15,18 @@ type UserService interface {
 type UserServiceImpl struct {
 }
 
-func NewUserService() *UserServiceImpl {
+func NewUserService() UserService {
 	return &UserServiceImpl{}
 }
 
 func (service UserServiceImpl) Register(request model.RegisterUserRequest, ctx context.Context) error {
 	userRepository := repository.NewUsersRepository()
 	user, err := userRepository.GetByEmail(ctx, request.Email)
-	if err.Error() != "not found" {
+	if err == nil {
 		return errors.New("email already used")
+	}
+	if err != nil && err.Error() != "not found" {
+		return errors.New("something went wrong")
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)

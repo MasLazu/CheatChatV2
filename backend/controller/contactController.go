@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/model/domain"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/MasLazu/CheatChatV2/service"
-	"log"
-	"net/http"
 )
 
 func AddContactController(writer http.ResponseWriter, request *http.Request) {

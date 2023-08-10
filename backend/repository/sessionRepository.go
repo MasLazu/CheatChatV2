@@ -17,7 +17,7 @@ type SessionRepositoryImpl struct {
 	databaseConn *sql.DB
 }
 
-func NewSessionRepository() *SessionRepositoryImpl {
+func NewSessionRepository() SessionRepository {
 	return &SessionRepositoryImpl{
 		databaseConn: database.GetDBConn(),
 	}

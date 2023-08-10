@@ -18,7 +18,7 @@ type UsersRepositoryImpl struct {
 	databaseConn *sql.DB
 }
 
-func NewUsersRepository() *UsersRepositoryImpl {
+func NewUsersRepository() UsersRepository {
 	return &UsersRepositoryImpl{
 		databaseConn: database.GetDBConn(),
 	}

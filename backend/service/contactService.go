@@ -14,7 +14,7 @@ type ContactService interface {
 type ContactServiceImpl struct {
 }
 
-func NewContactService() *ContactServiceImpl {
+func NewContactService() ContactService {
 	return &ContactServiceImpl{}
 }
 

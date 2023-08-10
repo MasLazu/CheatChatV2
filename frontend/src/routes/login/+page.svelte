@@ -1,10 +1,11 @@
 <script lang="ts">
 	import axios from 'axios'
-	import type { AxiosResponse } from 'axios'
+	import type { AxiosResponse, AxiosError } from 'axios'
 	import { useForm, email, required, Hint, validators, minLength } from 'svelte-use-form'
-	import type { apiResponse } from '../../lib/interfaces/apiResponse'
+	import type { apiResponse, messageApiResponse } from '../../lib/interfaces/apiResponse'
 	import { goto } from '$app/navigation'
-	import { userStore } from '$lib/store'
+	import { userStore } from '$lib/components/store/user'
+	import PageTransition from '$lib/components/PageTransition.svelte'
 
 	interface LoginApiResponse extends apiResponse {
 		data: {
@@ -14,26 +15,32 @@
 		}
 	}
 
+	let errorLogin: string | null = null
+
 	const form = useForm()
 
 	const handleLogin = async () => {
 		if ($form.valid) {
 			try {
 				await axios.post(
-					'http://' + import.meta.env.VITE_BACKEND_DOMAIN + '/api/guest/login',
+					`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/guest/login`,
 					$form.values,
 					{
 						withCredentials: true
 					}
 				)
 				const result: AxiosResponse<LoginApiResponse> = await axios.get(
-					'http://' + import.meta.env.VITE_BACKEND_DOMAIN + '/api/login/current',
+					`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/login/current`,
 					{ withCredentials: true }
 				)
 				userStore.set(result.data.data)
 				goto('/')
 			} catch (err) {
-				console.log(err)
+				const errors = err as AxiosError<messageApiResponse>
+				if (errors.response?.data.data.message) {
+					errorLogin = errors.response?.data.data.message
+				}
+				setTimeout(() => (errorLogin = null), 5000)
 			}
 		}
 	}
@@ -50,7 +57,7 @@
 			<span class="ml-1">Email</span>
 			<input
 				name="email"
-				class="bg-slate-100 border-[1px] border-slate-200 outline-none px-4 py-2.5 rounded-2xl"
+				class="bg-slate-100 border-[1px] border-slate-200 outline-none px-4 py-2.5 rounded-2xl w-full"
 				type="text"
 				placeholder="Input"
 				use:validators={[required, email]}
@@ -60,11 +67,11 @@
 				>Email must be a valid email</Hint
 			>
 		</label>
-		<label class="label my-3">
+		<label class="label mt-3 mb-5">
 			<span class="ml-1">Password</span>
 			<input
 				name="password"
-				class="bg-slate-100 border-[1px] border-slate-200 outline-none px-4 py-2.5 rounded-2xl"
+				class="bg-slate-100 border-[1px] border-slate-200 outline-none px-4 py-2.5 rounded-2xl w-full"
 				type="password"
 				placeholder="Input"
 				use:validators={[required, minLength(6)]}
@@ -74,9 +81,18 @@
 				>Password at least 6 character</Hint
 			>
 		</label>
+		<PageTransition trigger={errorLogin} amount={-8}>
+			{#if errorLogin}
+				<div
+					class="bg-error-100 p-2.5 w-full text-error-600 rounded-2xl border-2 border-error-300 flex justify-center mt-5"
+				>
+					<i class="bi bi-exclamation-triangle-fill mr-2" />{errorLogin}
+				</div>
+			{/if}
+		</PageTransition>
 		<button
 			type="submit"
-			class="btn btn-lg variant-filled w-full mt-10 rounded-2xl variant-filled-primary text-white"
+			class="btn btn-lg variant-filled w-full mt-8 rounded-2xl variant-filled-primary text-white"
 			>Login</button
 		>
 		<div class="text-center text-sm my-2">

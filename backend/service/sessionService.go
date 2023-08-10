@@ -21,7 +21,7 @@ type SessionService interface {
 type SessionServiceImpl struct {
 }
 
-func NewSessionService() *SessionServiceImpl {
+func NewSessionService() SessionService {
 	return &SessionServiceImpl{}
 }
 

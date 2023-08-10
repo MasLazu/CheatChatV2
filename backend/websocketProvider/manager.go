@@ -69,8 +69,6 @@ func (manager *Manager) Connect(writer http.ResponseWriter, request *http.Reques
 
 	groupRepository := repository.NewGroupReposiroty()
 	groups, err := groupRepository.GetUserGroupIds(request.Context(), user.Email)
-	log.Println("user_id : ", user.Email)
-	log.Println(groups)
 	if err != nil {
 		log.Println(err)
 		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL SERVER ERROR", err)

@@ -9,14 +9,16 @@ import (
 
 type GroupRepository interface {
 	Save(ctx context.Context, name string) (domain.Group, error)
-	GetAllUserGroup(ctx context.Context, userEmail string) ([]domain.Group, error)
+	GetUserGroups(ctx context.Context, userEmail string) ([]domain.Group, error)
+	AddMemberToGroup(ctx context.Context, userEmail string, groupId int64) error
+	GetUserGroupIds(ctx context.Context, userEmail string) ([]int64, error)
 }
 
 type GroupRepositoryImpl struct {
 	databaseConn *sql.DB
 }
 
-func NewGroupReposiroty() *GroupRepositoryImpl {
+func NewGroupReposiroty() GroupRepository {
 	return &GroupRepositoryImpl{
 		databaseConn: database.GetDBConn(),
 	}

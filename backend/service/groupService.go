@@ -13,7 +13,7 @@ type GroupService interface {
 type GroupServiceImpl struct {
 }
 
-func NewGroupService() *GroupServiceImpl {
+func NewGroupService() GroupService {
 	return &GroupServiceImpl{}
 }
 
