@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
 
 	"github.com/MasLazu/CheatChatV2/helper"
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/service"
 )
 
@@ -27,6 +27,6 @@ func (middleware LoginOnlyMiddleware) MiddlewareFunc(next http.Handler) http.Han
 			return
 		}
 
-		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "login oly route"})
+		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", web.MessageResponse{Message: "login oly route"})
 	})
 }

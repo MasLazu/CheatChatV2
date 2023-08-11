@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
 
 	"github.com/MasLazu/CheatChatV2/helper"
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/MasLazu/CheatChatV2/service"
 )
@@ -45,7 +45,7 @@ func (controller *GroupControllerImpl) GetUserGroups(writer http.ResponseWriter,
 }
 
 func (controller *GroupControllerImpl) Make(writer http.ResponseWriter, request *http.Request) {
-	groupRequest := model.MakeGroupRequest{}
+	groupRequest := web.MakeGroupRequest{}
 	if err := helper.ReadRequestBody(request, &groupRequest); err != nil {
 		helper.WriteBadRequestError(writer)
 		return

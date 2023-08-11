@@ -4,10 +4,10 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
 	"time"
 
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/model/domain"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/google/uuid"
@@ -15,7 +15,7 @@ import (
 )
 
 type SessionService interface {
-	Login(request model.LoginUserRequest, ctx context.Context) (domain.Session, error)
+	Login(request web.LoginUserRequest, ctx context.Context) (domain.Session, error)
 	Current(request *http.Request, ctx context.Context) (domain.User, error)
 }
 
@@ -31,7 +31,7 @@ func NewSessionService(userRepository repository.UserRepository, sessionReposito
 	}
 }
 
-func (service SessionServiceImpl) Login(request model.LoginUserRequest, ctx context.Context) (domain.Session, error) {
+func (service SessionServiceImpl) Login(request web.LoginUserRequest, ctx context.Context) (domain.Session, error) {
 	var session domain.Session
 
 	user, err := service.userRepository.GetByEmail(ctx, request.Email)

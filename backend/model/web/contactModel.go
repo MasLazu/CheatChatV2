@@ -1,4 +1,4 @@
-package model
+package web
 
 type AddContactRequest struct {
 	Name  string `json:"name" validate:"required"`

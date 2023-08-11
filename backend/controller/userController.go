@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
 
 	"github.com/MasLazu/CheatChatV2/helper"
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/service"
 )
 
@@ -27,7 +27,7 @@ func NewUserController(sessionService service.SessionService, userService servic
 }
 
 func (controller *UserControllerImpl) Register(writer http.ResponseWriter, request *http.Request) {
-	userRequest := model.RegisterUserRequest{}
+	userRequest := web.RegisterUserRequest{}
 	if err := helper.ReadRequestBody(request, &userRequest); err != nil {
 		helper.WriteBadRequestError(writer)
 		return
@@ -46,11 +46,11 @@ func (controller *UserControllerImpl) Register(writer http.ResponseWriter, reque
 		return
 	}
 
-	helper.WriteOk(writer, model.MessageResponse{Message: "register success"})
+	helper.WriteOk(writer, web.MessageResponse{Message: "register success"})
 }
 
 func (controller *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Request) {
-	userRequest := model.LoginUserRequest{}
+	userRequest := web.LoginUserRequest{}
 	if err := helper.ReadRequestBody(request, &userRequest); err != nil {
 		helper.WriteBadRequestError(writer)
 		return
@@ -71,7 +71,7 @@ func (controller *UserControllerImpl) Login(writer http.ResponseWriter, request 
 	}
 
 	helper.SetCookies(writer, "session", session.Token, session.ExpiredAt)
-	helper.WriteOk(writer, model.MessageResponse{Message: "login success"})
+	helper.WriteOk(writer, web.MessageResponse{Message: "login success"})
 }
 
 func (controller *UserControllerImpl) Current(writer http.ResponseWriter, request *http.Request) {
@@ -81,5 +81,5 @@ func (controller *UserControllerImpl) Current(writer http.ResponseWriter, reques
 		return
 	}
 
-	helper.WriteOk(writer, model.CuerrentResponse{Email: user.Email, Username: user.Username})
+	helper.WriteOk(writer, web.CuerrentResponse{Email: user.Email, Username: user.Username})
 }

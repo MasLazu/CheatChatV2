@@ -1,4 +1,4 @@
-package model
+package web
 
 type WebsocketReqRes struct {
 	MessageType int8

@@ -1,4 +1,4 @@
-package model
+package web
 
 type RegisterUserRequest struct {
 	Email    string `validate:"required,email" json:"email"`

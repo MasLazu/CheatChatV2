@@ -1,4 +1,4 @@
-package model
+package web
 
 type JsonResponse struct {
 	Code   int         `json:"code"`

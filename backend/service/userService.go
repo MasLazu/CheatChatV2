@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/MasLazu/CheatChatV2/model/web"
 
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
-	Register(request model.RegisterUserRequest, ctx context.Context) error
+	Register(request web.RegisterUserRequest, ctx context.Context) error
 }
 
 type UserServiceImpl struct {
@@ -23,7 +23,7 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 	}
 }
 
-func (service UserServiceImpl) Register(request model.RegisterUserRequest, ctx context.Context) error {
+func (service UserServiceImpl) Register(request web.RegisterUserRequest, ctx context.Context) error {
 	user, err := service.userRepository.GetByEmail(ctx, request.Email)
 	if err == nil {
 		return errors.New("email already used")

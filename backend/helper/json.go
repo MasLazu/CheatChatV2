@@ -2,9 +2,8 @@ package helper
 
 import (
 	"encoding/json"
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
-
-	"github.com/MasLazu/CheatChatV2/model"
 )
 
 func ReadRequestBody(request *http.Request, result interface{}) error {
@@ -20,7 +19,7 @@ func WriteResponse(writer http.ResponseWriter, code int, stauts string, response
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(code)
 	encoder := json.NewEncoder(writer)
-	response := model.JsonResponse{
+	response := web.JsonResponse{
 		Code:   code,
 		Status: stauts,
 		Data:   responseBody,
@@ -29,19 +28,19 @@ func WriteResponse(writer http.ResponseWriter, code int, stauts string, response
 }
 
 func WriteInternalServerError(writer http.ResponseWriter) {
-	WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "someting went wrong"})
+	WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", web.MessageResponse{Message: "someting went wrong"})
 }
 
 func WriteNotFoundError(writer http.ResponseWriter) {
-	WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
+	WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", web.MessageResponse{Message: "not found"})
 }
 
 func WriteUnauthorizedError(writer http.ResponseWriter) {
-	WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "unauthorized"})
+	WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", web.MessageResponse{Message: "unauthorized"})
 }
 
 func WriteBadRequestError(writer http.ResponseWriter) {
-	WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", model.MessageResponse{Message: "bad request"})
+	WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", web.MessageResponse{Message: "bad request"})
 }
 
 func WriteOk(writer http.ResponseWriter, responseBody any) {

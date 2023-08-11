@@ -1,16 +1,15 @@
 package websocketProvider
 
 import (
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
-
-	"github.com/MasLazu/CheatChatV2/model"
 )
 
 const (
 	PersonalMessage = 1
 )
 
-func (manager *Manager) Router(messageReq model.WebsocketReqRes) {
+func (manager *Manager) Router(messageReq web.WebsocketReqRes) {
 	if messageMap, ok := messageReq.Body.(map[string]any); ok {
 		switch messageReq.MessageType {
 		case PersonalMessage:

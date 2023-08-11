@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"net/http"
 
 	"github.com/MasLazu/CheatChatV2/helper"
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/model/domain"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/MasLazu/CheatChatV2/service"
@@ -31,7 +31,7 @@ func NewContactController(sessionService service.SessionService, contactService 
 }
 
 func (controller *ContactControllerImpl) Add(writer http.ResponseWriter, request *http.Request) {
-	contactRequest := model.AddContactRequest{}
+	contactRequest := web.AddContactRequest{}
 	if err := helper.ReadRequestBody(request, &contactRequest); err != nil {
 		helper.WriteBadRequestError(writer)
 		return
@@ -56,17 +56,17 @@ func (controller *ContactControllerImpl) Add(writer http.ResponseWriter, request
 	if err := controller.contactService.AddContact(contact, request.Context()); err != nil {
 		log.Println(err)
 		if err.Error() == "user not found" {
-			helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "user not found"})
+			helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", web.MessageResponse{Message: "user not found"})
 			return
 		} else if err.Error() == "pq: duplicate key value violates unique constraint \"contacts_pkey\"" {
-			helper.WriteResponse(writer, http.StatusBadRequest, "BAD REQUEST", model.MessageResponse{Message: "contact already exist"})
+			helper.WriteResponse(writer, http.StatusBadRequest, "BAD REQUEST", web.MessageResponse{Message: "contact already exist"})
 			return
 		}
 		helper.WriteInternalServerError(writer)
 		return
 	}
 
-	helper.WriteOk(writer, model.AddContactRequest{Name: contact.Name, Email: contact.SavedUserEmail})
+	helper.WriteOk(writer, web.AddContactRequest{Name: contact.Name, Email: contact.SavedUserEmail})
 }
 
 func (controller *ContactControllerImpl) GetUserContacts(writer http.ResponseWriter, request *http.Request) {

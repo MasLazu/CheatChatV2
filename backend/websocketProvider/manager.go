@@ -2,13 +2,13 @@ package websocketProvider
 
 import (
 	"encoding/json"
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 
 	"github.com/MasLazu/CheatChatV2/helper"
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/MasLazu/CheatChatV2/service"
 	"github.com/gorilla/websocket"
@@ -63,7 +63,7 @@ func (manager *Manager) Connect(writer http.ResponseWriter, request *http.Reques
 	conn, err := websocketUpgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		log.Println(err, " while upgrading to websocketProvider connection")
-		helper.WriteResponse(writer, http.StatusBadRequest, "BAD REQUEST", model.MessageResponse{Message: "error while upgrading to websocketProvider connection"})
+		helper.WriteResponse(writer, http.StatusBadRequest, "BAD REQUEST", web.MessageResponse{Message: "error while upgrading to websocketProvider connection"})
 		return
 	}
 
@@ -100,7 +100,7 @@ func (manager *Manager) removeClient(client *Client) {
 	delete(manager.Clients.Clients, client)
 }
 
-func (manager *Manager) SendMessageToUser(recieiverEmail string, message model.ChatResponse) {
+func (manager *Manager) SendMessageToUser(recieiverEmail string, message web.ChatResponse) {
 	for c := range manager.Clients.Clients {
 		if c.UserEmail == recieiverEmail {
 			response, err := json.Marshal(message)

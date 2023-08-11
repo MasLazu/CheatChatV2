@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
 	"strconv"
 
 	"github.com/MasLazu/CheatChatV2/helper"
-	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/MasLazu/CheatChatV2/service"
 	"github.com/gorilla/mux"
@@ -48,7 +48,7 @@ func (controller *ChatControllerImpl) GetPreviews(writer http.ResponseWriter, re
 		return
 	}
 
-	helper.WriteOk(writer, model.PreviewChatResponse{Group: previewGroupChat, Personal: previewPersonalChat})
+	helper.WriteOk(writer, web.PreviewChatResponse{Group: previewGroupChat, Personal: previewPersonalChat})
 }
 
 func (controller *ChatControllerImpl) GetPersonals(writer http.ResponseWriter, request *http.Request) {

@@ -1,10 +1,9 @@
 package websocketProvider
 
 import (
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"time"
-
-	"github.com/MasLazu/CheatChatV2/model"
 )
 
 func (manager *Manager) SendPersonalChatController(messageRequest map[string]any) {
@@ -26,7 +25,7 @@ func (manager *Manager) SendPersonalChatController(messageRequest map[string]any
 		return
 	}
 
-	message := model.ChatResponse{
+	message := web.ChatResponse{
 		SenderEmail: senderEmailReq,
 		Message:     messageReq,
 		CreatedAt:   time.Now(),

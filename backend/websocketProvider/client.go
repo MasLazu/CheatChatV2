@@ -2,10 +2,9 @@ package websocketProvider
 
 import (
 	"encoding/json"
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"time"
-
-	"github.com/MasLazu/CheatChatV2/model"
 
 	"github.com/gorilla/websocket"
 )
@@ -14,7 +13,7 @@ type Client struct {
 	Conn        *websocket.Conn
 	UserEmail   string
 	GroupList   []int64
-	MessageChan chan model.WebsocketReqRes
+	MessageChan chan web.WebsocketReqRes
 	Manager     *Manager
 }
 
@@ -28,7 +27,7 @@ func NewClient(conn *websocket.Conn, manager *Manager, email string, groupList [
 		Conn:        conn,
 		UserEmail:   email,
 		GroupList:   groupList,
-		MessageChan: make(chan model.WebsocketReqRes),
+		MessageChan: make(chan web.WebsocketReqRes),
 		Manager:     manager,
 	}
 }
@@ -60,7 +59,7 @@ func (client *Client) ReadMessage() {
 			break
 		}
 
-		var request model.WebsocketReqRes
+		var request web.WebsocketReqRes
 		if err := json.Unmarshal(payload, &request); err != nil {
 			log.Println(err, " marshalling message from ", client.UserEmail)
 			break
