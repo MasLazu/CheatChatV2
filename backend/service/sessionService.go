@@ -4,13 +4,14 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
+	"net/http"
+	"time"
+
 	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/model/domain"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"time"
 )
 
 type SessionService interface {

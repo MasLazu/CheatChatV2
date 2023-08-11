@@ -2,9 +2,10 @@ package websocketProvider
 
 import (
 	"encoding/json"
-	"github.com/MasLazu/CheatChatV2/model"
 	"log"
 	"time"
+
+	"github.com/MasLazu/CheatChatV2/model"
 
 	"github.com/gorilla/websocket"
 )

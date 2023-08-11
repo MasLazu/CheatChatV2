@@ -2,8 +2,9 @@ package helper
 
 import (
 	"encoding/json"
-	"github.com/MasLazu/CheatChatV2/model"
 	"net/http"
+
+	"github.com/MasLazu/CheatChatV2/model"
 )
 
 func ReadRequestBody(request *http.Request, result interface{}) error {

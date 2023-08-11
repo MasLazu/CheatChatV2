@@ -1,10 +1,11 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/service"
-	"net/http"
 )
 
 func GuestOnlyMiddleware(next http.Handler) http.Handler {

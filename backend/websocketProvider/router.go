@@ -1,8 +1,9 @@
 package websocketProvider
 
 import (
-	"github.com/MasLazu/CheatChatV2/model"
 	"log"
+
+	"github.com/MasLazu/CheatChatV2/model"
 )
 
 const (

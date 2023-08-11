@@ -1,11 +1,11 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/service"
-	"log"
-	"net/http"
 )
 
 func LoginOnlyMiddleware(next http.Handler) http.Handler {
@@ -18,7 +18,6 @@ func LoginOnlyMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		log.Println(err)
 		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "login oly route"})
 	})
 }

@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/MasLazu/CheatChatV2/service"
 	"github.com/gorilla/mux"
-	"net/http"
-	"strconv"
 )
 
 func GetPreviewChatController(writer http.ResponseWriter, request *http.Request) {
@@ -21,12 +22,12 @@ func GetPreviewChatController(writer http.ResponseWriter, request *http.Request)
 	chatRepository := repository.NewChatsRepository()
 	previewGroupChat, err := chatRepository.GetPreviewGroupChats(request.Context(), user.Email)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL SERVER ERROR", model.MessageResponse{Message: "something went wrong"})
+		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "something went wrong"})
 		return
 	}
 	previewPersonalChat, err := chatRepository.GetPreviewPersonalChats(request.Context(), user.Email)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL SERVER ERROR", model.MessageResponse{Message: "something went wrong"})
+		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "something went wrong"})
 		return
 	}
 
@@ -46,7 +47,7 @@ func GetPersonalFullChat(writer http.ResponseWriter, request *http.Request) {
 	chatRepository := repository.NewChatsRepository()
 	chats, err := chatRepository.GetPersonalChats(request.Context(), user.Email, email)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusNotFound, "NOT FOUND", model.MessageResponse{Message: "not found"})
+		helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
 		return
 	}
 
@@ -56,14 +57,14 @@ func GetPersonalFullChat(writer http.ResponseWriter, request *http.Request) {
 func GetGroupFullChats(writer http.ResponseWriter, request *http.Request) {
 	id, err := strconv.ParseInt(mux.Vars(request)["id"], 10, 64)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusNotFound, "NOT FOUND", model.MessageResponse{Message: "not found"})
+		helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
 		return
 	}
 
 	chatRepository := repository.NewChatsRepository()
 	chats, err := chatRepository.GetGroupChats(request.Context(), id)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusNotFound, "NOT FOUND", model.MessageResponse{Message: "not found"})
+		helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
 		return
 	}
 

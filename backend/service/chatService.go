@@ -2,9 +2,10 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/MasLazu/CheatChatV2/model/domain"
 	"github.com/MasLazu/CheatChatV2/repository"
-	"time"
 )
 
 type ChatService interface {

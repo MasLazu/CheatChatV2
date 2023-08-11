@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/MasLazu/CheatChatV2/database"
 	"github.com/MasLazu/CheatChatV2/middleware"
 	"github.com/MasLazu/CheatChatV2/router"
-	"log"
-	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -23,6 +24,7 @@ func main() {
 	routerMux := mux.NewRouter()
 
 	apiRoute := routerMux.PathPrefix("/api").Subrouter()
+	apiRoute.Use(middleware.PanicRecoveryMiddleware)
 
 	router.MainRouter(apiRoute)
 

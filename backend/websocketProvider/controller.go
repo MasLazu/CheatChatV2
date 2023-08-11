@@ -1,10 +1,11 @@
 package websocketProvider
 
 import (
-	"github.com/MasLazu/CheatChatV2/model"
-	"github.com/MasLazu/CheatChatV2/service"
 	"log"
 	"time"
+
+	"github.com/MasLazu/CheatChatV2/model"
+	"github.com/MasLazu/CheatChatV2/service"
 )
 
 func (manager *Manager) SendPersonalChatController(messageRequest map[string]any) {

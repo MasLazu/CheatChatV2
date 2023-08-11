@@ -2,15 +2,16 @@ package websocketProvider
 
 import (
 	"encoding/json"
+	"log"
+	"net/http"
+	"os"
+	"sync"
+
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/model"
 	"github.com/MasLazu/CheatChatV2/repository"
 	"github.com/MasLazu/CheatChatV2/service"
 	"github.com/gorilla/websocket"
-	"log"
-	"net/http"
-	"os"
-	"sync"
 )
 
 type ClientList struct {
