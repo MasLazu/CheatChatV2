@@ -9,43 +9,63 @@ import (
 	"github.com/MasLazu/CheatChatV2/service"
 )
 
-func GetUserGroupsController(writer http.ResponseWriter, request *http.Request) {
-	sessionService := service.NewSessionService()
-	user, err := sessionService.Current(request, request.Context())
-	if err != nil {
-		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "something went wrong"})
-	}
-
-	groupRepository := repository.NewGroupReposiroty()
-	groups, err := groupRepository.GetUserGroups(request.Context(), user.Email)
-	if err != nil {
-		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "something went wrong"})
-	}
-
-	helper.WriteResponse(writer, http.StatusOK, "OK", groups)
+type GroupController interface {
+	GetUserGroups(writer http.ResponseWriter, request *http.Request)
+	Make(writer http.ResponseWriter, request *http.Request)
 }
 
-func MakeGroupController(writer http.ResponseWriter, request *http.Request) {
+type GroupControllerImpl struct {
+	sessionService  service.SessionService
+	groupService    service.GroupService
+	groupRepository repository.GroupRepository
+}
+
+func NewGroupController(sessionService service.SessionService, groupService service.GroupService, groupRepository repository.GroupRepository) GroupController {
+	return &GroupControllerImpl{
+		sessionService:  sessionService,
+		groupService:    groupService,
+		groupRepository: groupRepository,
+	}
+}
+
+func (controller *GroupControllerImpl) GetUserGroups(writer http.ResponseWriter, request *http.Request) {
+	user, err := controller.sessionService.Current(request, request.Context())
+	if err != nil {
+		helper.WriteUnauthorizedError(writer)
+		return
+	}
+
+	groups, err := controller.groupRepository.GetUserGroups(request.Context(), user.Email)
+	if err != nil {
+		helper.WriteInternalServerError(writer)
+		return
+	}
+
+	helper.WriteOk(writer, groups)
+}
+
+func (controller *GroupControllerImpl) Make(writer http.ResponseWriter, request *http.Request) {
 	groupRequest := model.MakeGroupRequest{}
 	if err := helper.ReadRequestBody(request, &groupRequest); err != nil {
-		helper.WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", model.MessageResponse{Message: "bad request"})
+		helper.WriteBadRequestError(writer)
 		return
 	}
 
-	helper.Validate(writer, groupRequest)
-
-	sessionService := service.NewSessionService()
-	user, err := sessionService.Current(request, request.Context())
-	if err != nil {
-		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "something went wrong"})
-	}
-
-	groupService := service.NewGroupService()
-	group, err := groupService.MakeGroup(user.Email, groupRequest.Name, request.Context())
-	if err != nil {
-		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "something went wrong"})
+	if err := helper.Validate(writer, groupRequest); err != nil {
 		return
 	}
 
-	helper.WriteResponse(writer, http.StatusOK, "OK", group)
+	user, err := controller.sessionService.Current(request, request.Context())
+	if err != nil {
+		helper.WriteUnauthorizedError(writer)
+		return
+	}
+
+	group, err := controller.groupService.MakeGroup(user.Email, groupRequest.Name, request.Context())
+	if err != nil {
+		helper.WriteInternalServerError(writer)
+		return
+	}
+
+	helper.WriteOk(writer, group)
 }

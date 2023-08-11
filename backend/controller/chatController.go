@@ -11,62 +11,76 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetPreviewChatController(writer http.ResponseWriter, request *http.Request) {
-	sessionService := service.NewSessionService()
-	user, err := sessionService.Current(request, request.Context())
-	if err != nil {
-		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "login only route"})
-		return
-	}
-
-	chatRepository := repository.NewChatsRepository()
-	previewGroupChat, err := chatRepository.GetPreviewGroupChats(request.Context(), user.Email)
-	if err != nil {
-		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "something went wrong"})
-		return
-	}
-	previewPersonalChat, err := chatRepository.GetPreviewPersonalChats(request.Context(), user.Email)
-	if err != nil {
-		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "something went wrong"})
-		return
-	}
-
-	helper.WriteResponse(writer, http.StatusOK, "OK", model.PreviewChatResponse{Group: previewGroupChat, Personal: previewPersonalChat})
+type ChatController interface {
+	GetPreviews(writer http.ResponseWriter, request *http.Request)
+	GetPersonals(writer http.ResponseWriter, request *http.Request)
+	GetGroups(writer http.ResponseWriter, request *http.Request)
 }
 
-func GetPersonalFullChat(writer http.ResponseWriter, request *http.Request) {
+type ChatControllerImpl struct {
+	sessionService service.SessionService
+	chatRepository repository.ChatRepository
+}
+
+func NewChatController(sessionService service.SessionService, chatRepository repository.ChatRepository) ChatController {
+	return &ChatControllerImpl{
+		sessionService: sessionService,
+		chatRepository: chatRepository,
+	}
+}
+
+func (controller *ChatControllerImpl) GetPreviews(writer http.ResponseWriter, request *http.Request) {
+	user, err := controller.sessionService.Current(request, request.Context())
+	if err != nil {
+		helper.WriteUnauthorizedError(writer)
+		return
+	}
+
+	previewGroupChat, err := controller.chatRepository.GetPreviewGroupChats(request.Context(), user.Email)
+	if err != nil {
+		helper.WriteInternalServerError(writer)
+		return
+	}
+
+	previewPersonalChat, err := controller.chatRepository.GetPreviewPersonalChats(request.Context(), user.Email)
+	if err != nil {
+		helper.WriteInternalServerError(writer)
+		return
+	}
+
+	helper.WriteOk(writer, model.PreviewChatResponse{Group: previewGroupChat, Personal: previewPersonalChat})
+}
+
+func (controller *ChatControllerImpl) GetPersonals(writer http.ResponseWriter, request *http.Request) {
 	email := mux.Vars(request)["email"]
 
-	sessionService := service.NewSessionService()
-	user, err := sessionService.Current(request, request.Context())
+	user, err := controller.sessionService.Current(request, request.Context())
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "login only route"})
+		helper.WriteUnauthorizedError(writer)
 		return
 	}
 
-	chatRepository := repository.NewChatsRepository()
-	chats, err := chatRepository.GetPersonalChats(request.Context(), user.Email, email)
+	chats, err := controller.chatRepository.GetPersonalChats(request.Context(), user.Email, email)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
+		helper.WriteNotFoundError(writer)
 		return
 	}
 
-	helper.WriteResponse(writer, http.StatusOK, "OK", chats)
+	helper.WriteOk(writer, chats)
 }
 
-func GetGroupFullChats(writer http.ResponseWriter, request *http.Request) {
+func (controller *ChatControllerImpl) GetGroups(writer http.ResponseWriter, request *http.Request) {
 	id, err := strconv.ParseInt(mux.Vars(request)["id"], 10, 64)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
+		helper.WriteNotFoundError(writer)
 		return
 	}
 
-	chatRepository := repository.NewChatsRepository()
-	chats, err := chatRepository.GetGroupChats(request.Context(), id)
+	chats, err := controller.chatRepository.GetGroupChats(request.Context(), id)
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
+		helper.WriteNotFoundError(writer)
 		return
 	}
 
-	helper.WriteResponse(writer, http.StatusOK, "OK", chats)
+	helper.WriteOk(writer, chats)
 }

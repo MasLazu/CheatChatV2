@@ -6,7 +6,13 @@ import (
 	"github.com/MasLazu/CheatChatV2/helper"
 )
 
-func PanicRecoveryMiddleware(next http.Handler) http.Handler {
+type PanicRecoveryMiddleware struct{}
+
+func NewPanicRecoveryMiddleware() *PanicRecoveryMiddleware {
+	return &PanicRecoveryMiddleware{}
+}
+
+func (middleware PanicRecoveryMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {

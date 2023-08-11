@@ -12,20 +12,23 @@ type GroupService interface {
 }
 
 type GroupServiceImpl struct {
+	groupRepository repository.GroupRepository
 }
 
-func NewGroupService() GroupService {
-	return &GroupServiceImpl{}
+func NewGroupService(groupRepository repository.GroupRepository) GroupService {
+	return &GroupServiceImpl{
+		groupRepository: groupRepository,
+	}
 }
 
-func (GroupServiceImpl) MakeGroup(userEmail string, groupName string, ctx context.Context) (domain.Group, error) {
+func (service *GroupServiceImpl) MakeGroup(userEmail string, groupName string, ctx context.Context) (domain.Group, error) {
 	var groupEmpty domain.Group
-	groupRepository := repository.NewGroupReposiroty()
-	group, err := groupRepository.Save(ctx, groupName)
+	group, err := service.groupRepository.Save(ctx, groupName)
 	if err != nil {
 		return groupEmpty, err
 	}
-	if err := groupRepository.AddMemberToGroup(ctx, userEmail, group.Id); err != nil {
+
+	if err := service.groupRepository.AddMemberToGroup(ctx, userEmail, group.Id); err != nil {
 		return groupEmpty, err
 	}
 

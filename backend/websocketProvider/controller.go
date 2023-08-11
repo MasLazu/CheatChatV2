@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/MasLazu/CheatChatV2/model"
-	"github.com/MasLazu/CheatChatV2/service"
 )
 
 func (manager *Manager) SendPersonalChatController(messageRequest map[string]any) {
@@ -33,8 +32,7 @@ func (manager *Manager) SendPersonalChatController(messageRequest map[string]any
 		CreatedAt:   time.Now(),
 	}
 
-	chatService := service.NewChatService()
-	id, err := chatService.SavePersonalChat(senderEmailReq, receiverEmailReq, messageReq, message.CreatedAt)
+	id, err := manager.chatService.SavePersonalChat(senderEmailReq, receiverEmailReq, messageReq, message.CreatedAt)
 	if err != nil {
 		return
 	}

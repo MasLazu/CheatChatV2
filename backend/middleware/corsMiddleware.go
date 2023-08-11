@@ -7,7 +7,13 @@ import (
 	"github.com/rs/cors"
 )
 
-func EnableCORS(next http.Handler) http.Handler {
+type CorsMiddleware struct{}
+
+func NewCorsMiddleware() *CorsMiddleware {
+	return &CorsMiddleware{}
+}
+
+func (middleware CorsMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("FRONTEND_DOMAIN")},
 		AllowCredentials: true,

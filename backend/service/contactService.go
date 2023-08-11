@@ -13,22 +13,27 @@ type ContactService interface {
 }
 
 type ContactServiceImpl struct {
+	userRepository     repository.UserRepository
+	personalRepository repository.PersonalRepository
+	contactRepository  repository.ContactRepository
 }
 
-func NewContactService() ContactService {
-	return &ContactServiceImpl{}
+func NewContactService(userRepository repository.UserRepository, personalRepository repository.PersonalRepository, contactRepository repository.ContactRepository) ContactService {
+	return &ContactServiceImpl{
+		userRepository:     userRepository,
+		personalRepository: personalRepository,
+		contactRepository:  contactRepository,
+	}
 }
 
-func (service ContactServiceImpl) AddContact(request domain.Contact, ctx context.Context) error {
-	userRepository := repository.NewUsersRepository()
-	if _, err := userRepository.GetByEmail(ctx, request.SavedUserEmail); err != nil {
+func (service *ContactServiceImpl) AddContact(request domain.Contact, ctx context.Context) error {
+	if _, err := service.userRepository.GetByEmail(ctx, request.SavedUserEmail); err != nil {
 		return errors.New("user not found")
 	}
 
-	personalRepository := repository.NewPersonalRepository()
-	if _, err := personalRepository.GetByMember(request.UserEmail, request.SavedUserEmail, ctx); err != nil {
+	if _, err := service.personalRepository.GetByMember(request.UserEmail, request.SavedUserEmail, ctx); err != nil {
 		if err.Error() == "not found" {
-			if err := personalRepository.Save(request.UserEmail, request.SavedUserEmail, ctx); err != nil {
+			if err := service.personalRepository.Save(request.UserEmail, request.SavedUserEmail, ctx); err != nil {
 				return err
 			}
 		} else {
@@ -36,8 +41,7 @@ func (service ContactServiceImpl) AddContact(request domain.Contact, ctx context
 		}
 	}
 
-	contactRepository := repository.NewContactRepository()
-	if err := contactRepository.Save(ctx, request); err != nil {
+	if err := service.contactRepository.Save(ctx, request); err != nil {
 		return err
 	}
 

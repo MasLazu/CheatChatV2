@@ -8,59 +8,78 @@ import (
 	"github.com/MasLazu/CheatChatV2/service"
 )
 
-func RegisterController(writer http.ResponseWriter, request *http.Request) {
-	userRequest := model.RegisterUserRequest{}
-	if err := helper.ReadRequestBody(request, &userRequest); err != nil {
-		helper.WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", model.MessageResponse{Message: "bad request"})
-		return
-	}
-
-	helper.Validate(writer, userRequest)
-
-	userService := service.NewUserService()
-	if err := userService.Register(userRequest, request.Context()); err != nil {
-		if err.Error() == "something went wrong" {
-			helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: err.Error()})
-			return
-		}
-		helper.WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", model.MessageResponse{Message: err.Error()})
-		return
-	}
-
-	helper.WriteResponse(writer, http.StatusOK, "OK", model.MessageResponse{Message: "register success"})
+type UserController interface {
+	Register(writer http.ResponseWriter, request *http.Request)
+	Login(writer http.ResponseWriter, request *http.Request)
+	Current(writer http.ResponseWriter, request *http.Request)
 }
 
-func LoginController(writer http.ResponseWriter, request *http.Request) {
-	userRequest := model.LoginUserRequest{}
+type UserControllerImpl struct {
+	sessionService service.SessionService
+	userService    service.UserService
+}
+
+func NewUserController(sessionService service.SessionService, userService service.UserService) UserController {
+	return &UserControllerImpl{
+		sessionService: sessionService,
+		userService:    userService,
+	}
+}
+
+func (controller *UserControllerImpl) Register(writer http.ResponseWriter, request *http.Request) {
+	userRequest := model.RegisterUserRequest{}
 	if err := helper.ReadRequestBody(request, &userRequest); err != nil {
-		helper.WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", model.MessageResponse{Message: "bad request"})
+		helper.WriteBadRequestError(writer)
+		return
 	}
 
-	helper.Validate(writer, userRequest)
+	if err := helper.Validate(writer, userRequest); err != nil {
+		return
+	}
 
-	sessionService := service.NewSessionService()
-	session, err := sessionService.Login(userRequest, request.Context())
-
-	if err != nil {
+	if err := controller.userService.Register(userRequest, request.Context()); err != nil {
 		if err.Error() == "something went wrong" {
-			helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: err.Error()})
+			helper.WriteInternalServerError(writer)
 			return
 		}
-		helper.WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", model.MessageResponse{Message: err.Error()})
+		helper.WriteBadRequestError(writer)
+		return
+	}
+
+	helper.WriteOk(writer, model.MessageResponse{Message: "register success"})
+}
+
+func (controller *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Request) {
+	userRequest := model.LoginUserRequest{}
+	if err := helper.ReadRequestBody(request, &userRequest); err != nil {
+		helper.WriteBadRequestError(writer)
+		return
+	}
+
+	if err := helper.Validate(writer, userRequest); err != nil {
+		return
+	}
+
+	session, err := controller.sessionService.Login(userRequest, request.Context())
+	if err != nil {
+		if err.Error() == "something went wrong" {
+			helper.WriteInternalServerError(writer)
+			return
+		}
+		helper.WriteBadRequestError(writer)
 		return
 	}
 
 	helper.SetCookies(writer, "session", session.Token, session.ExpiredAt)
-	helper.WriteResponse(writer, http.StatusOK, "OK", model.MessageResponse{Message: "login success"})
+	helper.WriteOk(writer, model.MessageResponse{Message: "login success"})
 }
 
-func CurrentController(writer http.ResponseWriter, request *http.Request) {
-	sessionService := service.NewSessionService()
-	user, err := sessionService.Current(request, request.Context())
+func (controller *UserControllerImpl) Current(writer http.ResponseWriter, request *http.Request) {
+	user, err := controller.sessionService.Current(request, request.Context())
 	if err != nil {
-		helper.WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "login only route"})
+		helper.WriteUnauthorizedError(writer)
 		return
 	}
 
-	helper.WriteResponse(writer, http.StatusOK, "OK", model.CuerrentResponse{Email: user.Email, Username: user.Username})
+	helper.WriteOk(writer, model.CuerrentResponse{Email: user.Email, Username: user.Username})
 }

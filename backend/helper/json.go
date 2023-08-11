@@ -27,3 +27,23 @@ func WriteResponse(writer http.ResponseWriter, code int, stauts string, response
 	}
 	encoder.Encode(response)
 }
+
+func WriteInternalServerError(writer http.ResponseWriter) {
+	WriteResponse(writer, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", model.MessageResponse{Message: "someting went wrong"})
+}
+
+func WriteNotFoundError(writer http.ResponseWriter) {
+	WriteResponse(writer, http.StatusNotFound, "NOT_FOUND", model.MessageResponse{Message: "not found"})
+}
+
+func WriteUnauthorizedError(writer http.ResponseWriter) {
+	WriteResponse(writer, http.StatusUnauthorized, "UNAUTHORIZED", model.MessageResponse{Message: "unauthorized"})
+}
+
+func WriteBadRequestError(writer http.ResponseWriter) {
+	WriteResponse(writer, http.StatusBadRequest, "BAD_REQUEST", model.MessageResponse{Message: "bad request"})
+}
+
+func WriteOk(writer http.ResponseWriter, responseBody any) {
+	WriteResponse(writer, http.StatusOK, "OK", responseBody)
+}

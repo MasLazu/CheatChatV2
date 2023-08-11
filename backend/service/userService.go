@@ -14,15 +14,17 @@ type UserService interface {
 }
 
 type UserServiceImpl struct {
+	userRepository repository.UserRepository
 }
 
-func NewUserService() UserService {
-	return &UserServiceImpl{}
+func NewUserService(userRepository repository.UserRepository) UserService {
+	return &UserServiceImpl{
+		userRepository: userRepository,
+	}
 }
 
 func (service UserServiceImpl) Register(request model.RegisterUserRequest, ctx context.Context) error {
-	userRepository := repository.NewUsersRepository()
-	user, err := userRepository.GetByEmail(ctx, request.Email)
+	user, err := service.userRepository.GetByEmail(ctx, request.Email)
 	if err == nil {
 		return errors.New("email already used")
 	}
@@ -39,7 +41,7 @@ func (service UserServiceImpl) Register(request model.RegisterUserRequest, ctx c
 	user.Username = request.Username
 	user.Password = string(hashedPassword)
 
-	if err := userRepository.Save(ctx, user); err != nil {
+	if err := service.userRepository.Save(ctx, user); err != nil {
 		return errors.New("something went wrong")
 	}
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/MasLazu/CheatChatV2/database"
 	"github.com/MasLazu/CheatChatV2/model/domain"
 )
 
@@ -17,13 +16,13 @@ type ContactRepositoryImpl struct {
 	databaseConn *sql.DB
 }
 
-func NewContactRepository() ContactRepository {
+func NewContactRepository(databaseConn *sql.DB) ContactRepository {
 	return &ContactRepositoryImpl{
-		databaseConn: database.GetDBConn(),
+		databaseConn: databaseConn,
 	}
 }
 
-func (repository ContactRepositoryImpl) Save(ctx context.Context, contact domain.Contact) error {
+func (repository *ContactRepositoryImpl) Save(ctx context.Context, contact domain.Contact) error {
 	sql := "INSERT INTO contacts(user_email, name, saved_user_email) values ($1, $2, $3)"
 	if _, err := repository.databaseConn.ExecContext(ctx, sql, contact.UserEmail, contact.Name, contact.SavedUserEmail); err != nil {
 		return err
@@ -31,7 +30,7 @@ func (repository ContactRepositoryImpl) Save(ctx context.Context, contact domain
 	return nil
 }
 
-func (repository ContactRepositoryImpl) GetUserContacts(ctx context.Context, userEmail string) ([]domain.Contact, error) {
+func (repository *ContactRepositoryImpl) GetUserContacts(ctx context.Context, userEmail string) ([]domain.Contact, error) {
 	var contacts []domain.Contact
 	sql := "SELECT name, saved_user_email FROM contacts WHERE user_email = $1"
 	row, err := repository.databaseConn.QueryContext(ctx, sql, userEmail)

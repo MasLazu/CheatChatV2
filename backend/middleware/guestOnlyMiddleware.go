@@ -8,11 +8,20 @@ import (
 	"github.com/MasLazu/CheatChatV2/service"
 )
 
-func GuestOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		sessionService := service.NewSessionService()
+type GuestOnlyMiddleware struct {
+	sessionService service.SessionService
+}
 
-		if _, err := sessionService.Current(request, request.Context()); err != nil {
+func NewGuestOnlyMiddleware(sessionService service.SessionService) *GuestOnlyMiddleware {
+	return &GuestOnlyMiddleware{
+		sessionService: sessionService,
+	}
+}
+
+func (middleware GuestOnlyMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+
+		if _, err := middleware.sessionService.Current(request, request.Context()); err != nil {
 			next.ServeHTTP(writer, request)
 			return
 		}

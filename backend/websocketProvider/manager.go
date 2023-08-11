@@ -40,15 +40,22 @@ type Manager struct {
 	PersonalMessageType int
 	GroupMessageType    int
 	Clients             ClientList
+
+	sessionService  service.SessionService
+	chatService     service.ChatService
+	groupRepository repository.GroupRepository
 }
 
-func NewWebsocketManager() *Manager {
+func NewManager(sessionService service.SessionService, chatService service.ChatService, groupRepository repository.GroupRepository) *Manager {
 	return &Manager{
 		PersonalMessageType: 1,
 		GroupMessageType:    2,
 		Clients: ClientList{
 			Clients: make(map[*Client]bool),
 		},
+		sessionService:  sessionService,
+		chatService:     chatService,
+		groupRepository: groupRepository,
 	}
 }
 
@@ -60,16 +67,14 @@ func (manager *Manager) Connect(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	sessionService := service.NewSessionService()
-	user, err := sessionService.Current(request, request.Context())
+	user, err := manager.sessionService.Current(request, request.Context())
 	if err != nil {
 		log.Println(err)
 		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL SERVER ERROR", err)
 		return
 	}
 
-	groupRepository := repository.NewGroupReposiroty()
-	groups, err := groupRepository.GetUserGroupIds(request.Context(), user.Email)
+	groups, err := manager.groupRepository.GetUserGroupIds(request.Context(), user.Email)
 	if err != nil {
 		log.Println(err)
 		helper.WriteResponse(writer, http.StatusInternalServerError, "INTERNAL SERVER ERROR", err)

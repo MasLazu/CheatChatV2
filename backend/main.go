@@ -4,11 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/MasLazu/CheatChatV2/app"
 	"github.com/MasLazu/CheatChatV2/database"
-	"github.com/MasLazu/CheatChatV2/middleware"
-	"github.com/MasLazu/CheatChatV2/router"
 
-	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -21,13 +19,8 @@ func main() {
 	database.DBInit()
 	defer database.CloseDBConn()
 
-	routerMux := mux.NewRouter()
-
-	apiRoute := routerMux.PathPrefix("/api").Subrouter()
-	apiRoute.Use(middleware.PanicRecoveryMiddleware)
-
-	router.MainRouter(apiRoute)
+	router := app.BootstrapApp().Router()
 
 	log.Println("server runing on port 8080")
-	log.Fatal(http.ListenAndServe("localhost:8080", middleware.EnableCORS(routerMux)))
+	log.Fatal(http.ListenAndServe("localhost:8080", router))
 }

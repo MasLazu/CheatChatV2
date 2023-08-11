@@ -20,17 +20,21 @@ type SessionService interface {
 }
 
 type SessionServiceImpl struct {
+	userRepository    repository.UserRepository
+	sessionRepository repository.SessionRepository
 }
 
-func NewSessionService() SessionService {
-	return &SessionServiceImpl{}
+func NewSessionService(userRepository repository.UserRepository, sessionRepository repository.SessionRepository) SessionService {
+	return &SessionServiceImpl{
+		userRepository:    userRepository,
+		sessionRepository: sessionRepository,
+	}
 }
 
 func (service SessionServiceImpl) Login(request model.LoginUserRequest, ctx context.Context) (domain.Session, error) {
 	var session domain.Session
 
-	userRepository := repository.NewUsersRepository()
-	user, err := userRepository.GetByEmail(ctx, request.Email)
+	user, err := service.userRepository.GetByEmail(ctx, request.Email)
 	if err != nil {
 		return session, errors.New("credential not metch")
 	}
@@ -48,8 +52,7 @@ func (service SessionServiceImpl) Login(request model.LoginUserRequest, ctx cont
 	session.Token = uuid.New().String()
 	session.ExpiredAt = time.Now().Add(24 * time.Hour)
 
-	sessionRepository := repository.NewSessionRepository()
-	if err := sessionRepository.InsertIfExistUpdate(session, ctx); err != nil {
+	if err := service.sessionRepository.InsertIfExistUpdate(session, ctx); err != nil {
 		return session, errors.New("something went wrong")
 	}
 
@@ -63,8 +66,7 @@ func (service SessionServiceImpl) Current(request *http.Request, ctx context.Con
 		return user, err
 	}
 
-	sessionRepository := repository.NewSessionRepository()
-	currentSession, err := sessionRepository.GetByToken(ctx, sessionCookie.Value)
+	currentSession, err := service.sessionRepository.GetByToken(ctx, sessionCookie.Value)
 	if err != nil {
 		return user, err
 	}
@@ -73,8 +75,7 @@ func (service SessionServiceImpl) Current(request *http.Request, ctx context.Con
 		return user, err
 	}
 
-	userRepository := repository.NewUsersRepository()
-	user, err = userRepository.GetByEmail(ctx, currentSession.UserEmail)
+	user, err = service.userRepository.GetByEmail(ctx, currentSession.UserEmail)
 	if err != nil {
 		return user, err
 	}

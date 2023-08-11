@@ -13,18 +13,20 @@ type ChatService interface {
 }
 
 type ChatServiceImpl struct {
+	chatRepository repository.ChatRepository
 }
 
-func NewChatService() ChatService {
-	return &ChatServiceImpl{}
+func NewChatService(chatRepository repository.ChatRepository) ChatService {
+	return &ChatServiceImpl{
+		chatRepository: chatRepository,
+	}
 }
 
-func (service ChatServiceImpl) SavePersonalChat(senderEmail string, receiverEmail string, message string, createdAt time.Time) (int64, error) {
+func (service *ChatServiceImpl) SavePersonalChat(senderEmail string, receiverEmail string, message string, createdAt time.Time) (int64, error) {
 	ctx := context.TODO()
 	var chatId int64
 
-	chatRepository := repository.NewChatsRepository()
-	chatRoom, err := chatRepository.GetPersonalChatRoom(ctx, senderEmail, receiverEmail)
+	chatRoom, err := service.chatRepository.GetPersonalChatRoom(ctx, senderEmail, receiverEmail)
 	if err != nil {
 		return chatId, err
 	}
@@ -36,7 +38,7 @@ func (service ChatServiceImpl) SavePersonalChat(senderEmail string, receiverEmai
 		CreatedAt:   createdAt,
 	}
 
-	chatId, err = chatRepository.Save(ctx, chat)
+	chatId, err = service.chatRepository.Save(ctx, chat)
 	if err != nil {
 		return chatId, err
 	}
