@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"github.com/MasLazu/CheatChatV2/model/web"
+	"log"
 	"net/http"
 
 	"github.com/MasLazu/CheatChatV2/helper"
+	"github.com/MasLazu/CheatChatV2/model/web"
 	"github.com/MasLazu/CheatChatV2/service"
 )
 
@@ -18,9 +19,10 @@ func NewLoginOnlyMiddleware(sessionService service.SessionService) *LoginOnlyMid
 	}
 }
 
-func (middleware LoginOnlyMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
+func (middleware *LoginOnlyMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
+		log.Println("login only middleware")
 		_, err := middleware.sessionService.Current(request, request.Context())
 		if err == nil {
 			next.ServeHTTP(writer, request)

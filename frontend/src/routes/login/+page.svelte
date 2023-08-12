@@ -22,12 +22,11 @@
 	const handleLogin = async () => {
 		if ($form.valid) {
 			try {
+				console.log(`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/guest/login`)
 				await axios.post(
 					`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/guest/login`,
 					$form.values,
-					{
-						withCredentials: true
-					}
+					{ withCredentials: true }
 				)
 				const result: AxiosResponse<LoginApiResponse> = await axios.get(
 					`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/login/current`,

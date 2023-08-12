@@ -5,11 +5,13 @@ import (
 	"github.com/MasLazu/CheatChatV2/middleware"
 	"github.com/MasLazu/CheatChatV2/websocketProvider"
 
+	"net/http"
+
 	"github.com/gorilla/mux"
 )
 
 type Router interface {
-	Router() *mux.Router
+	Handler() http.Handler
 }
 
 type RouterImpl struct {
@@ -51,14 +53,11 @@ func NewRouter(
 	}
 }
 
-func (router *RouterImpl) Router() *mux.Router {
+func (router *RouterImpl) Handler() http.Handler {
 	apiRoute := router.router.PathPrefix("/api").Subrouter()
 
 	//panic recovery middleware
 	apiRoute.Use(router.panicRecoveryMiddlware.MiddlewareFunc)
-
-	//cors middleware
-	apiRoute.Use(router.corsMiddleware.MiddlewareFunc)
 
 	//login only route
 	loginRoute := apiRoute.PathPrefix("/login").Subrouter()
@@ -85,5 +84,6 @@ func (router *RouterImpl) Router() *mux.Router {
 	guestRoute.HandleFunc("/register", router.userController.Register).Methods("POST")
 	guestRoute.HandleFunc("/login", router.userController.Login).Methods("POST")
 
-	return router.router
+	//cors middleware
+	return router.corsMiddleware.MiddlewareFunc(router.router)
 }

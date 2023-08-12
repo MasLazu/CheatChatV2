@@ -12,7 +12,7 @@ func NewPanicRecoveryMiddleware() *PanicRecoveryMiddleware {
 	return &PanicRecoveryMiddleware{}
 }
 
-func (middleware PanicRecoveryMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
+func (middleware *PanicRecoveryMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {

@@ -11,6 +11,7 @@
 	const form = useForm()
 
 	const handleRegister = async () => {
+		console.log($form.values)
 		if ($form.valid) {
 			try {
 				const result: AxiosResponse<messageApiResponse> = await axios.post(
@@ -86,7 +87,7 @@
 			{/if}
 		</PageTransition>
 		<button
-			type="button"
+			type="submit"
 			class="btn btn-lg variant-filled w-full mt-8 rounded-2xl variant-filled-primary text-white"
 			>Register</button
 		>

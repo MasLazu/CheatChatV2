@@ -19,8 +19,8 @@ func main() {
 	database.DBInit()
 	defer database.CloseDBConn()
 
-	router := app.BootstrapApp().Router()
+	handler := app.BootstrapApp().Handler()
 
 	log.Println("server runing on port 8080")
-	log.Fatal(http.ListenAndServe("localhost:8080", router))
+	log.Fatal(http.ListenAndServe("localhost:8080", handler))
 }

@@ -183,7 +183,7 @@
 	})
 </script>
 
-<div class="bg-white min-h-screen w-screen">
+<div class="bg-slate-100 min-h-screen w-screen">
 	<PageTransition trigger={path} amount={-50}>
 		<slot />
 	</PageTransition>
