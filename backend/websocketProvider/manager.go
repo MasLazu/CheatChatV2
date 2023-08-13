@@ -2,11 +2,12 @@ package websocketProvider
 
 import (
 	"encoding/json"
-	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"net/http"
 	"os"
 	"sync"
+
+	"github.com/MasLazu/CheatChatV2/model/web"
 
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/repository"
@@ -100,7 +101,7 @@ func (manager *Manager) removeClient(client *Client) {
 	delete(manager.Clients.Clients, client)
 }
 
-func (manager *Manager) SendMessageToUser(recieiverEmail string, message web.ChatResponse) {
+func (manager *Manager) SendMessageToUser(recieiverEmail string, message web.ChatResponse, sender *Client) {
 	for c := range manager.Clients.Clients {
 		if c.UserEmail == recieiverEmail {
 			response, err := json.Marshal(message)
@@ -111,6 +112,11 @@ func (manager *Manager) SendMessageToUser(recieiverEmail string, message web.Cha
 			if err := c.Conn.WriteMessage(websocket.TextMessage, response); err != nil {
 				log.Println(err, " while sending message to ", recieiverEmail)
 			}
+			if err := sender.Conn.WriteMessage(websocket.TextMessage, response); err != nil {
+				log.Println(err, " while sending message to ", recieiverEmail)
+			}
+
+			log.Println("message sent to ", c.UserEmail)
 		}
 	}
 }

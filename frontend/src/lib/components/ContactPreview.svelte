@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Avatar } from '@skeletonlabs/skeleton'
-	import { loadFullChat } from './utils/helper/loadFullChat'
+	import { loadFullChat } from '$lib/utils/helper/loadFullChat'
 	import { toastStore, type ToastSettings } from '@skeletonlabs/skeleton'
 
 	export let name: string

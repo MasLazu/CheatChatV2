@@ -12,7 +12,7 @@
 		<div>
 			<header class="flex gap-6 items-center p-1">
 				<p class="font-bold text-sm">{name}</p>
-				<small class="opacity-50 text-sm">{timestamp}</small>
+				<small class="opacity-50 md:text-sm text-xs">{timestamp}</small>
 			</header>
 			<div class="card lg:p-4 p-3 bg-white border-slate-300 rounded-2xl rounded-tl-none space-y-2">
 				<p class="text-sm lg:text-base">{message}</p>

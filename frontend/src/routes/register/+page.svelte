@@ -4,7 +4,7 @@
 	import { useForm, email, required, Hint, validators, minLength } from 'svelte-use-form'
 	import type { AxiosError } from 'axios'
 	import PageTransition from '$lib/components/PageTransition.svelte'
-	import type { messageApiResponse } from '../../lib/interfaces/apiResponse'
+	import type { messageApiResponse } from '$lib/interfaces/apiResponse'
 
 	let errorLogin: string | null = null
 

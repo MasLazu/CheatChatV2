@@ -1,4 +1,4 @@
-import { contactsStore } from '$lib/components/store/contact'
+import { contactsStore } from '$lib/store/contact'
 import { get } from 'svelte/store'
 
 export const nameIfSaved = (email: string) => {

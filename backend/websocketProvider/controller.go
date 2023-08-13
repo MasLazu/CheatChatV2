@@ -1,12 +1,13 @@
 package websocketProvider
 
 import (
-	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"time"
+
+	"github.com/MasLazu/CheatChatV2/model/web"
 )
 
-func (manager *Manager) SendPersonalChatController(messageRequest map[string]any) {
+func (manager *Manager) SendPersonalChatController(messageRequest map[string]any, sender *Client) {
 	senderEmailReq, ok := messageRequest["sender_email"].(string)
 	if !ok {
 		log.Println("sender_email error")
@@ -26,10 +27,13 @@ func (manager *Manager) SendPersonalChatController(messageRequest map[string]any
 	}
 
 	message := web.ChatResponse{
-		SenderEmail: senderEmailReq,
-		Message:     messageReq,
-		CreatedAt:   time.Now(),
+		SenderEmail:   senderEmailReq,
+		ReceiverEmail: receiverEmailReq,
+		Message:       messageReq,
+		CreatedAt:     time.Now(),
 	}
+
+	log.Println("SendPersonalChatController : ", message)
 
 	id, err := manager.chatService.SavePersonalChat(senderEmailReq, receiverEmailReq, messageReq, message.CreatedAt)
 	if err != nil {
@@ -37,5 +41,5 @@ func (manager *Manager) SendPersonalChatController(messageRequest map[string]any
 	}
 
 	message.Id = id
-	manager.SendMessageToUser(receiverEmailReq, message)
+	manager.SendMessageToUser(receiverEmailReq, message, sender)
 }

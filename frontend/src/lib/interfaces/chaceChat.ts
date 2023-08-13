@@ -1,4 +1,4 @@
-import type { chat } from './cacheChat'
+import type { chat } from './chat'
 
 export interface cacheChat {
 	//null if not group

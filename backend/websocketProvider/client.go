@@ -2,9 +2,10 @@ package websocketProvider
 
 import (
 	"encoding/json"
-	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"time"
+
+	"github.com/MasLazu/CheatChatV2/model/web"
 
 	"github.com/gorilla/websocket"
 )
@@ -80,7 +81,7 @@ func (client *Client) WriteMessage() {
 	for {
 		select {
 		case message := <-client.MessageChan:
-			client.Manager.Router(message)
+			client.Manager.Router(message, client)
 		case <-ticker.C:
 			log.Println("current client : ", len(client.Manager.Clients.Clients))
 			log.Println("sending ping to ", client.UserEmail)

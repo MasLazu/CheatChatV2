@@ -2,9 +2,9 @@
 	import axios from 'axios'
 	import type { AxiosResponse, AxiosError } from 'axios'
 	import { useForm, email, required, Hint, validators, minLength } from 'svelte-use-form'
-	import type { apiResponse, messageApiResponse } from '../../lib/interfaces/apiResponse'
+	import type { apiResponse, messageApiResponse } from '$lib/interfaces/apiResponse'
 	import { goto } from '$app/navigation'
-	import { userStore } from '$lib/components/store/user'
+	import { userStore } from '$lib/store/user'
 	import PageTransition from '$lib/components/PageTransition.svelte'
 
 	interface LoginApiResponse extends apiResponse {
@@ -22,7 +22,6 @@
 	const handleLogin = async () => {
 		if ($form.valid) {
 			try {
-				console.log(`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/guest/login`)
 				await axios.post(
 					`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/guest/login`,
 					$form.values,

@@ -4,9 +4,9 @@
 	import OurChatBubble from '$lib/components/OurChatBubble.svelte'
 	import PreviewMessage from '$lib/components/PreviewMessage.svelte'
 	import PageTransition from '$lib/components/PageTransition.svelte'
-	import { contactsStore } from '$lib/components/store/contact'
-	import { groupsStore } from '$lib/components/store/group'
-	import { previewChatStore } from '$lib/components/store/previewChat'
+	import { contactsStore } from '$lib/store/contact'
+	import { groupsStore } from '$lib/store/group'
+	import { previewChatStore } from '$lib/store/previewChat'
 	import ContactPreview from '$lib/components/ContactPreview.svelte'
 	import GroupPriview from '$lib/components/GroupPriview.svelte'
 	import { flip } from 'svelte/animate'
@@ -18,11 +18,13 @@
 	import type { contact } from '$lib/interfaces/contact'
 	import type { group } from '$lib/interfaces/group'
 	import axios from 'axios'
-	import { currentChatStore } from '$lib/components/store/currentChat'
-	import { userStore } from '$lib/components/store/user'
-	import { extractDate } from '$lib/components/utils/helper/extractDate'
-	import { nameIfSaved } from '$lib/components/utils/helper/nameIfSaved'
+	import { currentChatStore } from '$lib/store/currentChat'
+	import { userStore } from '$lib/store/user'
+	import { extractDate } from '$lib/utils/helper/extractDate'
+	import { nameIfSaved } from '$lib/utils/helper/nameIfSaved'
 	import { browser } from '$app/environment'
+	import { websocketStore } from '$lib/store/websocket'
+	import { cacheChatStore } from '$lib/store/cacheChat'
 
 	let heightTopBar: number
 
@@ -93,7 +95,6 @@
 
 	const handleMakeGroup = async () => {
 		if ($makeGroupForm.valid) {
-			console.log($makeGroupForm.values)
 			try {
 				const result: AxiosResponse<MakeGroupApiResponse> = await axios.post(
 					`http://${import.meta.env.VITE_BACKEND_DOMAIN}/api/login/group`,
@@ -112,6 +113,24 @@
 				}
 				setTimeout(() => (errorMakeGroup = null), 5000)
 			}
+		}
+	}
+
+	const sendMessageForm = useForm()
+
+	const handleSendMessage = async () => {
+		if ($sendMessageForm.valid) {
+			$websocketStore?.send(
+				JSON.stringify({
+					type: 1,
+					body: {
+						message: $sendMessageForm.values.message,
+						group_id: $currentChatStore?.groupId,
+						receiver_email: $currentChatStore?.email,
+						sender_email: $userStore?.email
+					}
+				})
+			)
 		}
 	}
 
@@ -355,7 +374,7 @@
 		>
 			<div
 				class="top-bar md:py-4 py-2.5 md:px-6 px-4 flex justify-between items-center"
-				style="height: {heightTopBar}px;"
+				style={windowWidth > 768 ? `height: ${heightTopBar}px;` : ''}
 			>
 				{#if browser && windowWidth < 768}
 					<button class="h-10 grid items-center" on:click={() => currentChatStore.set(null)}
@@ -400,19 +419,25 @@
 					{/each}
 				</div>
 			</div>
-			<from class="top-bar py-3 px-3 flex items-center gap-3">
-				<button class="h-full w-auto px-1"
+			<form
+				class="top-bar py-3 px-3 flex items-center gap-3"
+				on:submit|preventDefault={handleSendMessage}
+				use:sendMessageForm
+			>
+				<button type="button" class="h-full w-auto px-1"
 					><i class="bi bi-paperclip text-slate-400 text-3xl" />
 				</button>
 				<textarea
 					rows="1"
+					name="message"
 					class="textarea rounded-2xl bg-slate-100 p-3 h-full border-slate-200 resize-none flex-grow outline-none"
 					placeholder="Type a message"
+					use:validators={[required]}
 				/>
 				<button type="submit" class="btn-icon variant-filled bg-primary-500 h-full w-auto"
 					><i class="fa-solid fa-paper-plane text-2xl" /></button
 				>
-			</from>
+			</form>
 		</main>
 	{:else if windowWidth > 768}
 		<div

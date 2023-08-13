@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"os"
 
@@ -16,7 +15,6 @@ func NewCorsMiddleware() *CorsMiddleware {
 
 func (middleware *CorsMiddleware) MiddlewareFunc(next http.Handler) http.Handler {
 
-	log.Println("cors middleware")
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("FRONTEND_DOMAIN")},
 		AllowCredentials: true,

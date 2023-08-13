@@ -1,9 +1,9 @@
 import axios, { AxiosError } from 'axios'
 import type { AxiosResponse } from 'axios'
 import type { apiResponse } from '$lib/interfaces/apiResponse'
-import { cacheChatStore } from '$lib/components/store/cacheChat'
-import { groupsStore } from '$lib/components/store/group'
-import { currentChatStore } from '$lib/components/store/currentChat'
+import { cacheChatStore } from '$lib/store/cacheChat'
+import { groupsStore } from '$lib/store/group'
+import { currentChatStore } from '$lib/store/currentChat'
 import { get } from 'svelte/store'
 import type { messageApiResponse } from '$lib/interfaces/apiResponse'
 

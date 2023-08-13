@@ -9,7 +9,7 @@
 	<div class="grid grid-cols-[auto_1fr] gap-2 max-w-[70%]">
 		<div>
 			<header class="flex items-center justify-end p-1 text-sm">
-				<small>{timestamp}</small>
+				<small class=" md:text-sm text-xs">{timestamp}</small>
 			</header>
 			<div class="bg-primary-500 text-white rounded-xl rounded-tr-none space-y-2 lg:p-4 p-3">
 				<p class="text-sm lg:text-base">{message}</p>

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Avatar } from '@skeletonlabs/skeleton'
-	import { extractDate } from './utils/helper/extractDate'
-	import { userStore } from './store/user'
-	import { loadFullChat } from './utils/helper/loadFullChat'
+	import { extractDate } from '$lib/utils/helper/extractDate'
+	import { userStore } from '../store/user'
+	import { loadFullChat } from '$lib/utils/helper/loadFullChat'
 	import { toastStore, type ToastSettings } from '@skeletonlabs/skeleton'
-	import { nameIfSaved } from '$lib/components/utils/helper/nameIfSaved'
+	import { nameIfSaved } from '$lib/utils/helper/nameIfSaved'
 
 	export let senderEmail: string
 	export let message: string
