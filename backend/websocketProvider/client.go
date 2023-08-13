@@ -81,7 +81,7 @@ func (client *Client) WriteMessage() {
 	for {
 		select {
 		case message := <-client.MessageChan:
-			client.Manager.Router(message, client)
+			client.Manager.Router(message)
 		case <-ticker.C:
 			log.Println("current client : ", len(client.Manager.Clients.Clients))
 			log.Println("sending ping to ", client.UserEmail)

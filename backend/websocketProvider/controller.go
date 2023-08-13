@@ -7,7 +7,7 @@ import (
 	"github.com/MasLazu/CheatChatV2/model/web"
 )
 
-func (manager *Manager) SendPersonalChatController(messageRequest map[string]any, sender *Client) {
+func (manager *Manager) SendPersonalChatController(messageRequest map[string]any) {
 	senderEmailReq, ok := messageRequest["sender_email"].(string)
 	if !ok {
 		log.Println("sender_email error")
@@ -41,5 +41,41 @@ func (manager *Manager) SendPersonalChatController(messageRequest map[string]any
 	}
 
 	message.Id = id
-	manager.SendMessageToUser(receiverEmailReq, message, sender)
+	manager.SendMessageToUser(message)
+}
+
+func (manager *Manager) SendGroupChatController(messageRequest map[string]any) {
+	senderEmailReq, ok := messageRequest["sender_email"].(string)
+	if !ok {
+		log.Println("sender_email error")
+		return
+	}
+
+	messageReq, ok := messageRequest["message"].(string)
+	if !ok {
+		log.Println("message error")
+		return
+	}
+
+	groupIdReq, ok := messageRequest["group_id"].(float64)
+
+	if !ok {
+		log.Println("receiver_email error")
+		return
+	}
+
+	message := web.ChatResponse{
+		SenderEmail: senderEmailReq,
+		GroupId:     int64(groupIdReq),
+		Message:     messageReq,
+		CreatedAt:   time.Now(),
+	}
+
+	id, err := manager.chatService.SaveGroupChat(senderEmailReq, int64(groupIdReq), messageReq, message.CreatedAt)
+	if err != nil {
+		return
+	}
+
+	message.Id = id
+	manager.SendMessageToGroup(message)
 }

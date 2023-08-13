@@ -20,11 +20,12 @@ type PreviewPersonalChat struct {
 }
 
 type ChatResponse struct {
-	Id            int64     `json:"id"`
-	ReceiverEmail string    `json:"receiver_email"`
-	SenderEmail   string    `json:"sender_email"`
-	Message       string    `json:"message"`
-	CreatedAt     time.Time `json:"created_at"`
+	Id            int64     `json:"id,omitempty"`
+	GroupId       int64     `json:"group_id,omitempty"`
+	ReceiverEmail string    `json:"receiver_email,omitempty"`
+	SenderEmail   string    `json:"sender_email,omitempty"`
+	Message       string    `json:"message,omitempty"`
+	CreatedAt     time.Time `json:"created_at,omitempty"`
 }
 
 type PreviewChatResponse struct {

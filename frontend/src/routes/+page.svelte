@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Avatar } from '@skeletonlabs/skeleton'
-	import OtherChatBubble from '$lib/components/OtherChatBubble.svelte'
-	import OurChatBubble from '$lib/components/OurChatBubble.svelte'
+	import OtherChatBubble from '$lib/components/chatBubble/OtherChatBubble.svelte'
+	import OurChatBubble from '$lib/components/chatBubble/OurChatBubble.svelte'
 	import PreviewMessage from '$lib/components/PreviewMessage.svelte'
 	import PageTransition from '$lib/components/PageTransition.svelte'
 	import { contactsStore } from '$lib/store/contact'
@@ -24,6 +24,7 @@
 	import { nameIfSaved } from '$lib/utils/helper/nameIfSaved'
 	import { browser } from '$app/environment'
 	import { websocketStore } from '$lib/store/websocket'
+	import OtherGroupChatBubble from '$lib/components/chatBubble/OtherGroupChatBubble.svelte'
 	import { cacheChatStore } from '$lib/store/cacheChat'
 
 	let heightTopBar: number
@@ -118,11 +119,14 @@
 
 	const sendMessageForm = useForm()
 
+	let chatsWindow: HTMLDivElement
+	let bottomChat: HTMLDivElement
+
 	const handleSendMessage = async () => {
 		if ($sendMessageForm.valid) {
 			$websocketStore?.send(
 				JSON.stringify({
-					type: 1,
+					type: $currentChatStore?.groupId ? 2 : 1,
 					body: {
 						message: $sendMessageForm.values.message,
 						group_id: $currentChatStore?.groupId,
@@ -131,6 +135,21 @@
 					}
 				})
 			)
+		}
+
+		setTimeout(() => {
+			$sendMessageForm.reset()
+			chatsWindow.scrollTop = bottomChat.offsetTop
+		}, 100)
+	}
+
+	$: {
+		if ($currentChatStore && chatsWindow && bottomChat) {
+			setTimeout(() => {
+				if (chatsWindow && bottomChat) chatsWindow.scrollTop = bottomChat.offsetTop
+			}, 100)
+		} else if (!$currentChatStore) {
+			$sendMessageForm.reset()
 		}
 	}
 
@@ -404,19 +423,43 @@
 			<div
 				class="md:ml-1 mx-3 rounded-2xl grow bg-slate-100 overflow-y-auto border-[1px] border-slate-200"
 			>
-				<div class="lg:p-6 md:p-4 p-3 flex flex-col gap-6 rounded-2xl overflow-y-auto h-full">
-					{#each $currentChatStore?.chats ?? [] as chat}
+				<div
+					class="lg:p-6 md:p-4 p-3 px-2 flex flex-col rounded-2xl overflow-y-auto h-full"
+					bind:this={chatsWindow}
+				>
+					{#each $currentChatStore?.chats ?? [] as chat, index}
 						{#if chat.senderEmail === $userStore?.email}
-							<OurChatBubble message={chat.message} timestamp={extractDate(chat.createdAt)} />
-						{:else}
-							<OtherChatBubble
+							<OurChatBubble
+								message={chat.message}
+								timestamp={extractDate(chat.createdAt)}
+								variant={Math.floor(chat.createdAt.getTime() / 1000) ===
+								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 1000)
+									? 'compact'
+									: 'default'}
+							/>
+						{:else if $currentChatStore?.groupId}
+							<OtherGroupChatBubble
 								message={chat.message}
 								name={nameIfSaved(chat.senderEmail)}
 								timestamp={extractDate(chat.createdAt)}
 								photo={Math.floor(Math.random() * (40 - 1 + 1)) + 1}
+								variant={Math.floor(chat.createdAt.getTime() / 1000) ===
+								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 1000)
+									? 'compact'
+									: 'default'}
+							/>
+						{:else}
+							<OtherChatBubble
+								message={chat.message}
+								timestamp={extractDate(chat.createdAt)}
+								variant={Math.floor(chat.createdAt.getTime() / 1000) ===
+								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 1000)
+									? 'compact'
+									: 'default'}
 							/>
 						{/if}
 					{/each}
+					<div bind:this={bottomChat} />
 				</div>
 			</div>
 			<form

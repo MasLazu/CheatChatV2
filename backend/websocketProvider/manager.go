@@ -38,9 +38,7 @@ var (
 )
 
 type Manager struct {
-	PersonalMessageType int
-	GroupMessageType    int
-	Clients             ClientList
+	Clients ClientList
 
 	sessionService  service.SessionService
 	chatService     service.ChatService
@@ -49,8 +47,6 @@ type Manager struct {
 
 func NewManager(sessionService service.SessionService, chatService service.ChatService, groupRepository repository.GroupRepository) *Manager {
 	return &Manager{
-		PersonalMessageType: 1,
-		GroupMessageType:    2,
 		Clients: ClientList{
 			Clients: make(map[*Client]bool),
 		},
@@ -101,19 +97,16 @@ func (manager *Manager) removeClient(client *Client) {
 	delete(manager.Clients.Clients, client)
 }
 
-func (manager *Manager) SendMessageToUser(recieiverEmail string, message web.ChatResponse, sender *Client) {
+func (manager *Manager) SendMessageToUser(message web.ChatResponse) {
 	for c := range manager.Clients.Clients {
-		if c.UserEmail == recieiverEmail {
+		if c.UserEmail == message.ReceiverEmail || c.UserEmail == message.SenderEmail {
 			response, err := json.Marshal(message)
 			if err != nil {
 				log.Println(err, " while marshaling message")
 				return
 			}
 			if err := c.Conn.WriteMessage(websocket.TextMessage, response); err != nil {
-				log.Println(err, " while sending message to ", recieiverEmail)
-			}
-			if err := sender.Conn.WriteMessage(websocket.TextMessage, response); err != nil {
-				log.Println(err, " while sending message to ", recieiverEmail)
+				log.Println("error while sending message from ", message.SenderEmail, " to ", message.ReceiverEmail)
 			}
 
 			log.Println("message sent to ", c.UserEmail)
@@ -121,40 +114,21 @@ func (manager *Manager) SendMessageToUser(recieiverEmail string, message web.Cha
 	}
 }
 
-//func (socket *WebsocketService) brodcastToGroupMember(message model.WebsocketRequest, sender *Client) {
-//	chatsRepository := repository.NewChatsRepository()
-//	newMessage := domain.Chat{
-//		Sender:    sender.UserEmail,
-//		Body:      message.Message,
-//		CreatedAt: time.Now(),
-//	}
-//
-//	if err := chatsRepository.PushNewChatToGroup(context.Background(), message.GroupID, newMessage); err != nil {
-//		log.Println(err)
-//		return
-//	}
-//
-//	if err := chatsRepository.UpdateLastUpdateGroup(context.Background(), message.GroupID, newMessage.CreatedAt); err != nil {
-//		log.Println(err)
-//		return
-//	}
-//
-//	for c := range socket.Clients.Clients {
-//		for _, groupId := range c.GroupList {
-//			if groupId == message.GroupID && c.UserId != sender.UserId {
-//				response, err := json.Marshal(model.WbsocketResponse{
-//					GroupID:   message.GroupID,
-//					Sender:    sender.UserEmail,
-//					Body:      message.Message,
-//					CreatedAt: time.Now(),
-//				})
-//
-//				if err != nil {
-//					return
-//				}
-//
-//				c.Conn.WriteMessage(websocketProvider.TextMessage, response)
-//			}
-//		}
-//	}
-//}
+func (manager *Manager) SendMessageToGroup(message web.ChatResponse) {
+	for c := range manager.Clients.Clients {
+		for _, groupId := range c.GroupList {
+			if groupId == message.GroupId {
+				response, err := json.Marshal(message)
+				if err != nil {
+					log.Println(err, " while marshaling message")
+					return
+				}
+				if err := c.Conn.WriteMessage(websocket.TextMessage, response); err != nil {
+					log.Println("error while sending message from ", message.SenderEmail, " to ", c.UserEmail)
+				}
+
+				log.Println("message sent to ", c.UserEmail)
+			}
+		}
+	}
+}

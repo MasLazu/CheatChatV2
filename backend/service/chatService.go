@@ -10,6 +10,7 @@ import (
 
 type ChatService interface {
 	SavePersonalChat(senderEmail string, receiverEmail string, message string, createdAt time.Time) (int64, error)
+	SaveGroupChat(senderEmail string, groupId int64, message string, createdAt time.Time) (int64, error)
 }
 
 type ChatServiceImpl struct {
@@ -39,6 +40,25 @@ func (service *ChatServiceImpl) SavePersonalChat(senderEmail string, receiverEma
 	}
 
 	chatId, err = service.chatRepository.Save(ctx, chat)
+	if err != nil {
+		return chatId, err
+	}
+
+	return chatId, err
+}
+
+func (service *ChatServiceImpl) SaveGroupChat(senderEmail string, groupId int64, message string, createdAt time.Time) (int64, error) {
+	ctx := context.TODO()
+	var chatId int64
+
+	chat := domain.Chat{
+		SenderEmail: senderEmail,
+		Message:     message,
+		ChatRoom:    groupId,
+		CreatedAt:   createdAt,
+	}
+
+	chatId, err := service.chatRepository.Save(ctx, chat)
 	if err != nil {
 		return chatId, err
 	}

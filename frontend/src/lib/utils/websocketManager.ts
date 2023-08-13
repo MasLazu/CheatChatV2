@@ -42,7 +42,7 @@ export const websocketManager = (data: any) => {
 
 	//update current chat if open
 	if (
-		(get(currentChatStore)?.groupId && get(currentChatStore)?.email === data.groupId) ||
+		(get(currentChatStore)?.groupId && get(currentChatStore)?.groupId === data.group_id) ||
 		(get(currentChatStore)?.email &&
 			(get(currentChatStore)?.email === data.receiver_email ||
 				get(currentChatStore)?.email === data.sender_email))
@@ -91,6 +91,6 @@ export const websocketManager = (data: any) => {
 		return [...prev].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 	})
 
-	console.log(get(previewChatStore))
-	console.log(get(cacheChatStore))
+	// console.log(get(previewChatStore))
+	// console.log(get(cacheChatStore))
 }
