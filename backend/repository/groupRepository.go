@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/MasLazu/CheatChatV2/model/domain"
 )
@@ -12,6 +13,7 @@ type GroupRepository interface {
 	GetUserGroups(ctx context.Context, userEmail string) ([]domain.Group, error)
 	AddMemberToGroup(ctx context.Context, userEmail string, groupId int64) error
 	GetUserGroupIds(ctx context.Context, userEmail string) ([]int64, error)
+	GetChatRoom(ctx context.Context, groupId int64) (int64, error)
 }
 
 type GroupRepositoryImpl struct {
@@ -80,4 +82,22 @@ func (repository *GroupRepositoryImpl) GetUserGroupIds(ctx context.Context, user
 		groupIds = append(groupIds, groupId)
 	}
 	return groupIds, nil
+}
+
+func (repository *GroupRepositoryImpl) GetChatRoom(ctx context.Context, groupId int64) (int64, error) {
+	var chatRoom int64
+	sql := "SELECT chat_room FROM groups WHERE id = $1"
+	row, err := repository.databaseConn.QueryContext(ctx, sql, groupId)
+	if err != nil {
+		return chatRoom, err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		if err := row.Scan(&chatRoom); err != nil {
+			return chatRoom, err
+		}
+		return chatRoom, nil
+	}
+	return chatRoom, errors.New("not found")
 }

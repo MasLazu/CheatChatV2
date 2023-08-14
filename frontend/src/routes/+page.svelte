@@ -123,6 +123,15 @@
 	let bottomChat: HTMLDivElement
 
 	const handleSendMessage = async () => {
+		console.log('to server : ', {
+			type: $currentChatStore?.groupId ? 2 : 1,
+			body: {
+				message: $sendMessageForm.values.message,
+				group_id: $currentChatStore?.groupId,
+				receiver_email: $currentChatStore?.email,
+				sender_email: $userStore?.email
+			}
+		})
 		if ($sendMessageForm.valid) {
 			$websocketStore?.send(
 				JSON.stringify({

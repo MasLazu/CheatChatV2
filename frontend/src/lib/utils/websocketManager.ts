@@ -95,4 +95,6 @@ export const websocketManager = (data: any) => {
 
 		return [...prev].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 	})
+
+	console.log('from server : ', data)
 }

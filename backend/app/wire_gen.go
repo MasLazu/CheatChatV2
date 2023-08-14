@@ -39,7 +39,7 @@ func BootstrapApp() Router {
 	contactController := controller.NewContactController(sessionService, contactService, contactRepository)
 	chatRepository := repository.NewChatsRepository(db)
 	chatController := controller.NewChatController(sessionService, chatRepository)
-	chatService := service.NewChatService(chatRepository)
+	chatService := service.NewChatService(chatRepository, personalRepository, groupRepository)
 	manager := websocketProvider.NewManager(sessionService, chatService, groupRepository)
 	appRouter := NewRouter(router, corsMiddleware, guestOnlyMiddleware, loginOnlyMiddleware, panicRecoveryMiddleware, userController, groupController, contactController, chatController, manager)
 	return appRouter

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"github.com/MasLazu/CheatChatV2/model/web"
 
 	"github.com/MasLazu/CheatChatV2/model/domain"
@@ -13,7 +14,6 @@ type ChatRepository interface {
 	Save(ctx context.Context, chat domain.Chat) (int64, error)
 	GetPreviewGroupChats(ctx context.Context, userEmail string) ([]web.PreviewGroupChat, error)
 	GetPreviewPersonalChats(ctx context.Context, userEmail string) ([]web.PreviewPersonalChat, error)
-	GetPersonalChatRoom(ctx context.Context, userEmail1 string, userEmail2 string) (int64, error)
 	GetPersonalChats(ctx context.Context, userEmail1 string, userEmail2 string) ([]domain.Chat, error)
 	GetGroupChats(ctx context.Context, groupId int64) ([]domain.Chat, error)
 }
@@ -74,24 +74,6 @@ func (repository *ChatRepositoryImpl) GetPreviewPersonalChats(ctx context.Contex
 		previewPersonalChats = append(previewPersonalChats, previewPersonalChat)
 	}
 	return previewPersonalChats, nil
-}
-
-func (repository *ChatRepositoryImpl) GetPersonalChatRoom(ctx context.Context, userEmail1 string, userEmail2 string) (int64, error) {
-	var chatRoom int64
-	sql := "SELECT cr.id from personals p INNER JOIN chat_rooms cr on p.chat_room = cr.id WHERE (p.user_email_1 = $1 AND p.user_email_2 =$2) OR (p.user_email_2 = $1 AND p.user_email_1 = $2)"
-	row, err := repository.databaseConn.QueryContext(ctx, sql, userEmail1, userEmail2)
-	if err != nil {
-		return chatRoom, err
-	}
-	defer row.Close()
-
-	if row.Next() {
-		if err := row.Scan(&chatRoom); err != nil {
-			return chatRoom, err
-		}
-		return chatRoom, nil
-	}
-	return chatRoom, errors.New("not found")
 }
 
 func (repository *ChatRepositoryImpl) GetPersonalChats(ctx context.Context, userEmail1 string, userEmail2 string) ([]domain.Chat, error) {
