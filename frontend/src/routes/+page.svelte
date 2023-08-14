@@ -136,22 +136,18 @@
 				})
 			)
 		}
-
-		setTimeout(() => {
-			$sendMessageForm.reset()
-			chatsWindow.scrollTop = bottomChat.offsetTop
-		}, 100)
 	}
 
-	$: {
+	const reset = () => {
 		if ($currentChatStore && chatsWindow && bottomChat) {
 			setTimeout(() => {
-				if (chatsWindow && bottomChat) chatsWindow.scrollTop = bottomChat.offsetTop
+				chatsWindow.scrollTop = bottomChat.offsetTop
+				$sendMessageForm.reset()
 			}, 100)
-		} else if (!$currentChatStore) {
-			$sendMessageForm.reset()
 		}
 	}
+
+	$: $currentChatStore, reset()
 
 	let windowWidth: number
 </script>
@@ -432,8 +428,8 @@
 							<OurChatBubble
 								message={chat.message}
 								timestamp={extractDate(chat.createdAt)}
-								variant={Math.floor(chat.createdAt.getTime() / 1000) ===
-								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 1000)
+								variant={Math.floor(chat.createdAt.getTime() / 60000) ===
+								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 60000)
 									? 'compact'
 									: 'default'}
 							/>
@@ -443,8 +439,8 @@
 								name={nameIfSaved(chat.senderEmail)}
 								timestamp={extractDate(chat.createdAt)}
 								photo={Math.floor(Math.random() * (40 - 1 + 1)) + 1}
-								variant={Math.floor(chat.createdAt.getTime() / 1000) ===
-								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 1000)
+								variant={Math.floor(chat.createdAt.getTime() / 60000) ===
+								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 60000)
 									? 'compact'
 									: 'default'}
 							/>
@@ -452,8 +448,8 @@
 							<OtherChatBubble
 								message={chat.message}
 								timestamp={extractDate(chat.createdAt)}
-								variant={Math.floor(chat.createdAt.getTime() / 1000) ===
-								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 1000)
+								variant={Math.floor(chat.createdAt.getTime() / 60000) ===
+								Math.floor($currentChatStore.chats[index - 1]?.createdAt.getTime() / 60000)
 									? 'compact'
 									: 'default'}
 							/>

@@ -3,8 +3,13 @@ import { currentChatStore } from '$lib/store/currentChat'
 import { previewChatStore } from '$lib/store/previewChat'
 import { userStore } from '$lib/store/user'
 import { get } from 'svelte/store'
+import { stringToDate } from './helper/stringToDate'
 
 export const websocketManager = (data: any) => {
+	// console.log(data)
+	// const date = new Date(data.created_at)
+	// const CreatedAt = date.getTime() + date.getTimezoneOffset() * 60 * 1000
+
 	// new chat data
 	const chatData = {
 		id: data.id,
@@ -74,7 +79,7 @@ export const websocketManager = (data: any) => {
 				: data.sender_email === get(userStore)?.email
 				? data.receiver_email
 				: data.sender_email,
-			groupName: data.group_name ?? null,
+			groupName: data.group_id ? prev[index]?.groupName : null,
 			groupId: data.group_id ?? null,
 			message: data.message,
 			createdAt: new Date(data.created_at),
@@ -90,7 +95,4 @@ export const websocketManager = (data: any) => {
 
 		return [...prev].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 	})
-
-	// console.log(get(previewChatStore))
-	// console.log(get(cacheChatStore))
 }

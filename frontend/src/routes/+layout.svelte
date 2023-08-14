@@ -20,6 +20,7 @@
 	import { Toast, toastStore, type ToastSettings } from '@skeletonlabs/skeleton'
 	import type { contact } from '$lib/interfaces/contact'
 	import { websocketManager } from '$lib/utils/websocketManager'
+	import { stringToDate } from '$lib/utils/helper/stringToDate'
 
 	$: path = $page.url.pathname
 
@@ -133,21 +134,18 @@
 						senderEmail: group.sender_email,
 						message: group.message,
 						chatId: group.chat_id,
-						createdAt: new Date(group.created_at),
+						createdAt: stringToDate(group.created_at),
 						email: null
 					}
 				})
 				previewChats = groups ?? []
 				const personals = result.data.data.personal?.map((personal) => {
-					const date = new Date(personal.created_at)
-					const CreatedAt = date.getTime() + date.getTimezoneOffset() * 60 * 1000
-
 					return {
 						email: personal.email,
 						message: personal.message,
 						senderEmail: personal.sender_email,
 						chatId: personal.chat_id,
-						createdAt: new Date(CreatedAt),
+						createdAt: stringToDate(personal.created_at),
 						groupId: null,
 						groupName: null
 					}

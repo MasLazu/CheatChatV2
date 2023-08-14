@@ -6,6 +6,7 @@ import { groupsStore } from '$lib/store/group'
 import { currentChatStore } from '$lib/store/currentChat'
 import { get } from 'svelte/store'
 import type { messageApiResponse } from '$lib/interfaces/apiResponse'
+import { stringToDate } from './stringToDate'
 
 interface fullChatResponse extends apiResponse {
 	data: {
@@ -36,7 +37,7 @@ export const loadFullChat = async (key: number | string) => {
 							id: chat.id,
 							senderEmail: chat.sender_email,
 							message: chat.message,
-							createdAt: new Date(chat.created_at)
+							createdAt: stringToDate(chat.created_at)
 						}
 					})
 				}
@@ -73,7 +74,7 @@ export const loadFullChat = async (key: number | string) => {
 							id: chat.id,
 							senderEmail: chat.sender_email,
 							message: chat.message,
-							createdAt: new Date(chat.created_at)
+							createdAt: stringToDate(chat.created_at)
 						}
 					})
 				}
