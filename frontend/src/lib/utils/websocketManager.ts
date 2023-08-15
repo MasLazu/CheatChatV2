@@ -3,12 +3,8 @@ import { currentChatStore } from '$lib/store/currentChat'
 import { previewChatStore } from '$lib/store/previewChat'
 import { userStore } from '$lib/store/user'
 import { get } from 'svelte/store'
-import { stringToDate } from './helper/stringToDate'
 
 export const websocketManager = (data: any) => {
-	// console.log(data)
-	// const date = new Date(data.created_at)
-	// const CreatedAt = date.getTime() + date.getTimezoneOffset() * 60 * 1000
 
 	// new chat data
 	const chatData = {
