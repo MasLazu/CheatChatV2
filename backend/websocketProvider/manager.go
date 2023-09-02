@@ -40,12 +40,12 @@ var (
 type Manager struct {
 	Clients ClientList
 
-	sessionService  service.SessionService
-	chatService     service.ChatService
-	groupRepository repository.GroupRepository
+	sessionService  *service.SessionService
+	chatService     *service.ChatService
+	groupRepository *repository.GroupRepository
 }
 
-func NewManager(sessionService service.SessionService, chatService service.ChatService, groupRepository repository.GroupRepository) *Manager {
+func NewManager(sessionService *service.SessionService, chatService *service.ChatService, groupRepository *repository.GroupRepository) *Manager {
 	return &Manager{
 		Clients: ClientList{
 			Clients: make(map[*Client]bool),

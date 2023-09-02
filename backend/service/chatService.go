@@ -8,26 +8,21 @@ import (
 	"github.com/MasLazu/CheatChatV2/repository"
 )
 
-type ChatService interface {
-	SavePersonalChat(senderEmail string, receiverEmail string, message string, createdAt time.Time) (int64, error)
-	SaveGroupChat(senderEmail string, groupId int64, message string, createdAt time.Time) (int64, error)
+type ChatService struct {
+	chatRepository     *repository.ChatRepository
+	personalRepository *repository.PersonalRepository
+	groupRepository    *repository.GroupRepository
 }
 
-type ChatServiceImpl struct {
-	chatRepository     repository.ChatRepository
-	personalRepository repository.PersonalRepository
-	groupRepository    repository.GroupRepository
-}
-
-func NewChatService(chatRepository repository.ChatRepository, personalRepository repository.PersonalRepository, groupRepository repository.GroupRepository) ChatService {
-	return &ChatServiceImpl{
+func NewChatService(chatRepository *repository.ChatRepository, personalRepository *repository.PersonalRepository, groupRepository *repository.GroupRepository) *ChatService {
+	return &ChatService{
 		chatRepository:     chatRepository,
 		personalRepository: personalRepository,
 		groupRepository:    groupRepository,
 	}
 }
 
-func (service *ChatServiceImpl) SavePersonalChat(senderEmail string, receiverEmail string, message string, createdAt time.Time) (int64, error) {
+func (service *ChatService) SavePersonalChat(senderEmail string, receiverEmail string, message string, createdAt time.Time) (int64, error) {
 	ctx := context.TODO()
 	var chatId int64
 
@@ -51,7 +46,7 @@ func (service *ChatServiceImpl) SavePersonalChat(senderEmail string, receiverEma
 	return chatId, err
 }
 
-func (service *ChatServiceImpl) SaveGroupChat(senderEmail string, groupId int64, message string, createdAt time.Time) (int64, error) {
+func (service *ChatService) SaveGroupChat(senderEmail string, groupId int64, message string, createdAt time.Time) (int64, error) {
 	ctx := context.TODO()
 	var chatId int64
 

@@ -7,21 +7,17 @@ import (
 	"github.com/MasLazu/CheatChatV2/repository"
 )
 
-type GroupService interface {
-	MakeGroup(userEmail string, groupName string, ctx context.Context) (domain.Group, error)
+type GroupService struct {
+	groupRepository *repository.GroupRepository
 }
 
-type GroupServiceImpl struct {
-	groupRepository repository.GroupRepository
-}
-
-func NewGroupService(groupRepository repository.GroupRepository) GroupService {
-	return &GroupServiceImpl{
+func NewGroupService(groupRepository *repository.GroupRepository) *GroupService {
+	return &GroupService{
 		groupRepository: groupRepository,
 	}
 }
 
-func (service *GroupServiceImpl) MakeGroup(userEmail string, groupName string, ctx context.Context) (domain.Group, error) {
+func (service *GroupService) MakeGroup(userEmail string, groupName string, ctx context.Context) (domain.Group, error) {
 	var groupEmpty domain.Group
 	group, err := service.groupRepository.Save(ctx, groupName)
 	if err != nil {

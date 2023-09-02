@@ -1,9 +1,10 @@
 package controller
 
 import (
-	"github.com/MasLazu/CheatChatV2/model/web"
 	"log"
 	"net/http"
+
+	"github.com/MasLazu/CheatChatV2/model/web"
 
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/model/domain"
@@ -11,26 +12,21 @@ import (
 	"github.com/MasLazu/CheatChatV2/service"
 )
 
-type ContactController interface {
-	Add(writer http.ResponseWriter, request *http.Request)
-	GetUserContacts(writer http.ResponseWriter, request *http.Request)
+type ContactController struct {
+	sessionService    *service.SessionService
+	contactService    *service.ContactService
+	contactRepository *repository.ContactRepository
 }
 
-type ContactControllerImpl struct {
-	sessionService    service.SessionService
-	contactService    service.ContactService
-	contactRepository repository.ContactRepository
-}
-
-func NewContactController(sessionService service.SessionService, contactService service.ContactService, contactRepository repository.ContactRepository) ContactController {
-	return &ContactControllerImpl{
+func NewContactController(sessionService *service.SessionService, contactService *service.ContactService, contactRepository *repository.ContactRepository) *ContactController {
+	return &ContactController{
 		sessionService:    sessionService,
 		contactService:    contactService,
 		contactRepository: contactRepository,
 	}
 }
 
-func (controller *ContactControllerImpl) Add(writer http.ResponseWriter, request *http.Request) {
+func (controller *ContactController) Add(writer http.ResponseWriter, request *http.Request) {
 	contactRequest := web.AddContactRequest{}
 	if err := helper.ReadRequestBody(request, &contactRequest); err != nil {
 		helper.WriteBadRequestError(writer)
@@ -69,7 +65,7 @@ func (controller *ContactControllerImpl) Add(writer http.ResponseWriter, request
 	helper.WriteOk(writer, web.AddContactRequest{Name: contact.Name, Email: contact.SavedUserEmail})
 }
 
-func (controller *ContactControllerImpl) GetUserContacts(writer http.ResponseWriter, request *http.Request) {
+func (controller *ContactController) GetUserContacts(writer http.ResponseWriter, request *http.Request) {
 	user, err := controller.sessionService.Current(request, request.Context())
 	if err != nil {
 		helper.WriteUnauthorizedError(writer)

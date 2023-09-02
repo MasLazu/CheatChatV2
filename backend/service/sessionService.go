@@ -4,9 +4,10 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
-	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
 	"time"
+
+	"github.com/MasLazu/CheatChatV2/model/web"
 
 	"github.com/MasLazu/CheatChatV2/model/domain"
 	"github.com/MasLazu/CheatChatV2/repository"
@@ -14,24 +15,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type SessionService interface {
-	Login(request web.LoginUserRequest, ctx context.Context) (domain.Session, error)
-	Current(request *http.Request, ctx context.Context) (domain.User, error)
+type SessionService struct {
+	userRepository    *repository.UserRepository
+	sessionRepository *repository.SessionRepository
 }
 
-type SessionServiceImpl struct {
-	userRepository    repository.UserRepository
-	sessionRepository repository.SessionRepository
-}
-
-func NewSessionService(userRepository repository.UserRepository, sessionRepository repository.SessionRepository) SessionService {
-	return &SessionServiceImpl{
+func NewSessionService(userRepository *repository.UserRepository, sessionRepository *repository.SessionRepository) *SessionService {
+	return &SessionService{
 		userRepository:    userRepository,
 		sessionRepository: sessionRepository,
 	}
 }
 
-func (service SessionServiceImpl) Login(request web.LoginUserRequest, ctx context.Context) (domain.Session, error) {
+func (service SessionService) Login(request web.LoginUserRequest, ctx context.Context) (domain.Session, error) {
 	var session domain.Session
 
 	user, err := service.userRepository.GetByEmail(ctx, request.Email)
@@ -59,7 +55,7 @@ func (service SessionServiceImpl) Login(request web.LoginUserRequest, ctx contex
 	return session, nil
 }
 
-func (service SessionServiceImpl) Current(request *http.Request, ctx context.Context) (domain.User, error) {
+func (service SessionService) Current(request *http.Request, ctx context.Context) (domain.User, error) {
 	user := domain.User{}
 	sessionCookie, err := request.Cookie("session")
 	if err != nil {

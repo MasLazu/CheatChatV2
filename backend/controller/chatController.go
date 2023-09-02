@@ -1,9 +1,10 @@
 package controller
 
 import (
-	"github.com/MasLazu/CheatChatV2/model/web"
 	"net/http"
 	"strconv"
+
+	"github.com/MasLazu/CheatChatV2/model/web"
 
 	"github.com/MasLazu/CheatChatV2/helper"
 	"github.com/MasLazu/CheatChatV2/repository"
@@ -11,25 +12,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type ChatController interface {
-	GetPreviews(writer http.ResponseWriter, request *http.Request)
-	GetPersonals(writer http.ResponseWriter, request *http.Request)
-	GetGroups(writer http.ResponseWriter, request *http.Request)
+type ChatController struct {
+	sessionService *service.SessionService
+	chatRepository *repository.ChatRepository
 }
 
-type ChatControllerImpl struct {
-	sessionService service.SessionService
-	chatRepository repository.ChatRepository
-}
-
-func NewChatController(sessionService service.SessionService, chatRepository repository.ChatRepository) ChatController {
-	return &ChatControllerImpl{
+func NewChatController(sessionService *service.SessionService, chatRepository *repository.ChatRepository) *ChatController {
+	return &ChatController{
 		sessionService: sessionService,
 		chatRepository: chatRepository,
 	}
 }
 
-func (controller *ChatControllerImpl) GetPreviews(writer http.ResponseWriter, request *http.Request) {
+func (controller *ChatController) GetPreviews(writer http.ResponseWriter, request *http.Request) {
 	user, err := controller.sessionService.Current(request, request.Context())
 	if err != nil {
 		helper.WriteUnauthorizedError(writer)
@@ -51,7 +46,7 @@ func (controller *ChatControllerImpl) GetPreviews(writer http.ResponseWriter, re
 	helper.WriteOk(writer, web.PreviewChatResponse{Group: previewGroupChat, Personal: previewPersonalChat})
 }
 
-func (controller *ChatControllerImpl) GetPersonals(writer http.ResponseWriter, request *http.Request) {
+func (controller *ChatController) GetPersonals(writer http.ResponseWriter, request *http.Request) {
 	email := mux.Vars(request)["email"]
 
 	user, err := controller.sessionService.Current(request, request.Context())
@@ -69,7 +64,7 @@ func (controller *ChatControllerImpl) GetPersonals(writer http.ResponseWriter, r
 	helper.WriteOk(writer, chats)
 }
 
-func (controller *ChatControllerImpl) GetGroups(writer http.ResponseWriter, request *http.Request) {
+func (controller *ChatController) GetGroups(writer http.ResponseWriter, request *http.Request) {
 	id, err := strconv.ParseInt(mux.Vars(request)["id"], 10, 64)
 	if err != nil {
 		helper.WriteNotFoundError(writer)

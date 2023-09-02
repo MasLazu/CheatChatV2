@@ -20,10 +20,10 @@ type RouterImpl struct {
 	guestOnlyMiddlware     *middleware.GuestOnlyMiddleware
 	loginOnlyMiddlware     *middleware.LoginOnlyMiddleware
 	panicRecoveryMiddlware *middleware.PanicRecoveryMiddleware
-	userController         controller.UserController
-	groupController        controller.GroupController
-	contactController      controller.ContactController
-	chatController         controller.ChatController
+	userController         *controller.UserController
+	groupController        *controller.GroupController
+	contactController      *controller.ContactController
+	chatController         *controller.ChatController
 	websocketManager       *websocketProvider.Manager
 }
 
@@ -33,10 +33,10 @@ func NewRouter(
 	guestOnlyMiddlware *middleware.GuestOnlyMiddleware,
 	loginOnlyMiddlware *middleware.LoginOnlyMiddleware,
 	panicRecoveryMiddlware *middleware.PanicRecoveryMiddleware,
-	userController controller.UserController,
-	groupController controller.GroupController,
-	contactController controller.ContactController,
-	chatController controller.ChatController,
+	userController *controller.UserController,
+	groupController *controller.GroupController,
+	contactController *controller.ContactController,
+	chatController *controller.ChatController,
 	websocketManager *websocketProvider.Manager,
 ) Router {
 	return &RouterImpl{

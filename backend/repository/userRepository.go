@@ -9,22 +9,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type UserRepository interface {
-	Save(ctx context.Context, user domain.User) error
-	GetByEmail(ctx context.Context, email string) (domain.User, error)
-}
-
-type UserRepositoryImpl struct {
+type UserRepository struct {
 	databaseConn *sql.DB
 }
 
-func NewUserRepository(databaseConn *sql.DB) UserRepository {
-	return &UserRepositoryImpl{
+func NewUserRepository(databaseConn *sql.DB) *UserRepository {
+	return &UserRepository{
 		databaseConn: databaseConn,
 	}
 }
 
-func (repository *UserRepositoryImpl) Save(ctx context.Context, user domain.User) error {
+func (repository *UserRepository) Save(ctx context.Context, user domain.User) error {
 	sql := "INSERT INTO users(email, username, password, created_at) values ($1,$2,$3,NOW())"
 	if _, err := repository.databaseConn.ExecContext(ctx, sql, user.Email, user.Username, user.Password); err != nil {
 		return err
@@ -32,7 +27,7 @@ func (repository *UserRepositoryImpl) Save(ctx context.Context, user domain.User
 	return nil
 }
 
-func (repository *UserRepositoryImpl) GetByEmail(ctx context.Context, email string) (domain.User, error) {
+func (repository *UserRepository) GetByEmail(ctx context.Context, email string) (domain.User, error) {
 	sql := "SELECT email, username, password, created_at FROM users WHERE email=$1"
 	row, err := repository.databaseConn.QueryContext(ctx, sql, email)
 	user := domain.User{}

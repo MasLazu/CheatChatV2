@@ -8,25 +8,21 @@ import (
 	"github.com/MasLazu/CheatChatV2/repository"
 )
 
-type ContactService interface {
-	AddContact(request domain.Contact, ctx context.Context) error
+type ContactService struct {
+	userRepository     *repository.UserRepository
+	personalRepository *repository.PersonalRepository
+	contactRepository  *repository.ContactRepository
 }
 
-type ContactServiceImpl struct {
-	userRepository     repository.UserRepository
-	personalRepository repository.PersonalRepository
-	contactRepository  repository.ContactRepository
-}
-
-func NewContactService(userRepository repository.UserRepository, personalRepository repository.PersonalRepository, contactRepository repository.ContactRepository) ContactService {
-	return &ContactServiceImpl{
+func NewContactService(userRepository *repository.UserRepository, personalRepository *repository.PersonalRepository, contactRepository *repository.ContactRepository) *ContactService {
+	return &ContactService{
 		userRepository:     userRepository,
 		personalRepository: personalRepository,
 		contactRepository:  contactRepository,
 	}
 }
 
-func (service *ContactServiceImpl) AddContact(request domain.Contact, ctx context.Context) error {
+func (service *ContactService) AddContact(request domain.Contact, ctx context.Context) error {
 	if _, err := service.userRepository.GetByEmail(ctx, request.SavedUserEmail); err != nil {
 		return errors.New("user not found")
 	}

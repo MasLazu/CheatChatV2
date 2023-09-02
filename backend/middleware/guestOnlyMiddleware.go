@@ -9,10 +9,10 @@ import (
 )
 
 type GuestOnlyMiddleware struct {
-	sessionService service.SessionService
+	sessionService *service.SessionService
 }
 
-func NewGuestOnlyMiddleware(sessionService service.SessionService) *GuestOnlyMiddleware {
+func NewGuestOnlyMiddleware(sessionService *service.SessionService) *GuestOnlyMiddleware {
 	return &GuestOnlyMiddleware{
 		sessionService: sessionService,
 	}

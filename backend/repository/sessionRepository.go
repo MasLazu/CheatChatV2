@@ -8,22 +8,17 @@ import (
 	"github.com/MasLazu/CheatChatV2/model/domain"
 )
 
-type SessionRepository interface {
-	InsertIfExistUpdate(session domain.Session, ctx context.Context) error
-	GetByToken(ctx context.Context, token string) (domain.Session, error)
-}
-
-type SessionRepositoryImpl struct {
+type SessionRepository struct {
 	databaseConn *sql.DB
 }
 
-func NewSessionRepository(databaseConn *sql.DB) SessionRepository {
-	return &SessionRepositoryImpl{
+func NewSessionRepository(databaseConn *sql.DB) *SessionRepository {
+	return &SessionRepository{
 		databaseConn: databaseConn,
 	}
 }
 
-func (repository *SessionRepositoryImpl) InsertIfExistUpdate(session domain.Session, ctx context.Context) error {
+func (repository *SessionRepository) InsertIfExistUpdate(session domain.Session, ctx context.Context) error {
 	sql := "INSERT INTO sessions (user_email, token, expired_at) VALUES ($1, $2, $3) ON CONFLICT (user_email) DO UPDATE SET user_email = $1, token = $2, expired_at = $3"
 	if _, err := repository.databaseConn.ExecContext(ctx, sql, session.UserEmail, session.Token, session.ExpiredAt); err != nil {
 		return err
@@ -31,7 +26,7 @@ func (repository *SessionRepositoryImpl) InsertIfExistUpdate(session domain.Sess
 	return nil
 }
 
-func (repository *SessionRepositoryImpl) GetByToken(ctx context.Context, token string) (domain.Session, error) {
+func (repository *SessionRepository) GetByToken(ctx context.Context, token string) (domain.Session, error) {
 	sql := "SELECT user_email, token, expired_at FROM sessions WHERE token = $1"
 	row, err := repository.databaseConn.QueryContext(ctx, sql, token)
 	session := domain.Session{}
