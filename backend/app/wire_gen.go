@@ -14,11 +14,12 @@ import (
 	"github.com/MasLazu/CheatChatV2/service"
 	"github.com/MasLazu/CheatChatV2/websocketProvider"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 // Injectors from bootstrap.go:
 
-func BootstrapApp() Router {
+func BootstrapApp() http.Handler {
 	router := mux.NewRouter()
 	corsMiddleware := middleware.NewCorsMiddleware()
 	db := database.GetDBConn()
@@ -41,6 +42,6 @@ func BootstrapApp() Router {
 	chatController := controller.NewChatController(sessionService, chatRepository)
 	chatService := service.NewChatService(chatRepository, personalRepository, groupRepository)
 	manager := websocketProvider.NewManager(sessionService, chatService, groupRepository)
-	appRouter := NewRouter(router, corsMiddleware, guestOnlyMiddleware, loginOnlyMiddleware, panicRecoveryMiddleware, userController, groupController, contactController, chatController, manager)
-	return appRouter
+	handler := NewRouter(router, corsMiddleware, guestOnlyMiddleware, loginOnlyMiddleware, panicRecoveryMiddleware, userController, groupController, contactController, chatController, manager)
+	return handler
 }

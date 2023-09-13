@@ -4,6 +4,8 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/MasLazu/CheatChatV2/controller"
 	"github.com/MasLazu/CheatChatV2/database"
 	"github.com/MasLazu/CheatChatV2/middleware"
@@ -14,7 +16,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func BootstrapApp() Router {
+func BootstrapApp() http.Handler {
 	wire.Build(
 		//get database connection
 		database.GetDBConn,

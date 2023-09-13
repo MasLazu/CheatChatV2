@@ -37,6 +37,18 @@
 			)
 		}
 	}
+
+    const reset = () => {
+		if ($currentChatStore && chatsWindow && bottomChat) {
+			setTimeout(() => {
+				chatsWindow.scrollTop = bottomChat.offsetTop
+				$sendMessageForm.reset()
+			}, 100)
+		}
+	}
+
+	$: $currentChatStore, reset()
+    
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
